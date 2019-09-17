@@ -61,4 +61,8 @@ public class Compteur extends JPanel implements Runnable {
         timerThread = null;
     }
 
+    public int getTime() {
+        return time;
+    }
+
 }

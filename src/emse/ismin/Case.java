@@ -82,7 +82,6 @@ public class Case extends JPanel implements MouseListener {
 						g.setColor(new Color (0,0,0,100));
 						g.drawString(text,getWidth()/2,getHeight()/2);
 						g.fillRect(1, 1, getWidth(), getHeight());
-						updateScore(x,y);
 					}
                 }
                 			
@@ -115,11 +114,13 @@ public class Case extends JPanel implements MouseListener {
 	}
 		
 	
-	private void updateScore(int x, int y) {
+	private void updateLabels(int x, int y) {
 		if(!app.getChamp().getScoreCalculatedPositions()[x][y]) {
 			app.getChamp().getScoreCalculatedPositions()[x][y] = true;
-			app.setScore(app.getScore() + Integer.parseInt(app.getChamp().getCloseMines(x,y))*10);
-			app.getAppGui().updateScoreLabel();
+            app.setScore(app.getScore() + Integer.parseInt(app.getChamp().getCloseMines(x,y))*10);
+            app.setRemainingSquares(app.getRemainingSquares() - 1);
+            app.getAppGui().updateScoreLabel();
+            app.getAppGui().updateRemainingMinesLabel();
 		}
 	}
 	
@@ -130,18 +131,26 @@ public class Case extends JPanel implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+        clicked = true;
+        repaint();
+
         if(!app.isStarted()){
              app.setStarted(true);
              app.getAppGui().getCompteur().startTimer();
         }
 
-        if(!app.isLost()){
+        if(!app.isLost() || !app.isWon()){
             if(app.getChamp().isMine(x,y)){
                 app.getAppGui().onDeath();
             }
+            else{
+                updateLabels(x,y);
+                if(app.getRemainingSquares() == 0){
+                    app.getAppGui().onWin();
+                }
+            }
         }
 
-		clicked = true;
 		repaint();
 	}
 

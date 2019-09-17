@@ -15,7 +15,8 @@ import javax.swing.*;
 public class DemineurGUI extends JPanel implements ActionListener {
 
 	private Demineur app;
-	JLabel scoreLabel;
+    JLabel scoreLabel;
+    JLabel remainingMinesLabel;
 	private JButton quitButton;
 	private JButton resetButton;
 	private JButton revealButton;
@@ -50,7 +51,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         initializeMinefieldDisplay();
 		//generateMinefieldDisplay();
 
-		scoreLabel = new JLabel("Score: " + app.getScore());
+
 		
 		menuBar = new JMenuBar();
 		//Game
@@ -116,9 +117,14 @@ public class DemineurGUI extends JPanel implements ActionListener {
         lowerButtonPanel.add(quitButton);
         
         JPanel upperPanel = new JPanel();
+        scoreLabel = new JLabel("Score: " + app.getScore());
+        remainingMinesLabel = new JLabel("Remaining squares: " + app.getRemainingSquares());
         compteur = new Compteur();
         upperPanel.add(scoreLabel);
+        upperPanel.add(remainingMinesLabel);
+        upperPanel.add(scoreLabel);
         upperPanel.add(compteur);
+
 		add(upperPanel, BorderLayout.NORTH);
 		add(demineurPanel, BorderLayout.CENTER);
 		add(lowerButtonPanel, BorderLayout.SOUTH);
@@ -152,8 +158,12 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	}
 	
 	protected void updateScoreLabel() {
-		scoreLabel.setText("Score: " + String.valueOf(app.getScore()));
-	}
+		scoreLabel.setText("Score: " + app.getScore());
+    }
+    
+    protected void updateRemainingMinesLabel(){
+        remainingMinesLabel.setText("Remaining squares: " + app.getRemainingSquares());
+    }
 	
 	private void updatePanelGodMode() {
 		for(int i = 0; i < demineurPanelCases.length; i++) {
@@ -170,6 +180,16 @@ public class DemineurGUI extends JPanel implements ActionListener {
         JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
         updatePanelGodMode();
         app.setLost(true);
+        app.WriteScore();
+    }
+
+    protected void onWin(){
+        compteur.stopTimer();
+        final ImageIcon winIcon = new ImageIcon("img/win.jpg");
+        JOptionPane.showMessageDialog(null, "YOU WIN\nScore: " + String.valueOf(app.getScore()) + "\nTime: " + String.valueOf(compteur.getTime()), "Win", JOptionPane.INFORMATION_MESSAGE, winIcon);
+        updatePanelGodMode();
+        app.setWon(true);
+        app.WriteScore();
     }
 	
 	private void newGame(Level difficulty) {
@@ -225,6 +245,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         app.reset();
         resetMinefieldDisplay();
         updateScoreLabel();
+        updateRemainingMinesLabel();
         compteur.resetTimer();
     }
 

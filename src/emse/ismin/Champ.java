@@ -21,12 +21,12 @@ public class Champ {
     
     private Level difficulty;
     
-	final private static int NBMINESEASY = 5;
+	final private static int NBMINESEASY = 2;
 	final private static int NBMINESMEDIUM = 20;
 	final private static int NBMINESHARD = 80;
 	final private static int NBMINESIMPOSSIBLE = 80;
 	
-	final private static int DIMEASY = 5;
+	final private static int DIMEASY = 3;
 	final private static int DIMMEDIUM = 10;
 	final private static int DIMHARD = 20;
 	final private static int DIMIMPOSSIBLE = 10;
@@ -57,7 +57,34 @@ public class Champ {
 		
 		return dim;
 		
-	}
+    }
+    
+    public int getInitialMineNumber(Level difficulty){
+		int mine = 0;
+		switch(difficulty) {
+		case EASY:
+            mine = NBMINESEASY;
+            break;
+			
+		case MEDIUM:
+            mine = NBMINESMEDIUM;
+			break;
+		
+		case HARD:
+            mine = NBMINESHARD;
+			break;
+			
+		case IMPOSSIBLE:
+            mine = NBMINESIMPOSSIBLE;
+			break;
+			
+		case CUSTOM:
+			mine = 0;
+			break;
+		}
+		
+		return mine;
+    }
 	
 	public Champ(Level difficulty) {
         this.difficulty = difficulty;
