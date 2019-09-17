@@ -36,15 +36,19 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	
 	private JMenuItem menuQuit;
 	private JMenuItem menuHelp;
-	private JMenuItem menuReset;
+    private JMenuItem menuReset;
+    
+    private Compteur compteur;
+
 	
 	public DemineurGUI(Demineur app) {
 		//ImageIcon quitIcon = new ImageIcon("sortieCLR.gif");
 		this.app = app;
 		
 		this.setLayout(new BorderLayout());
-		
-		generateMinefieldDisplay();
+        
+        initializeMinefieldDisplay();
+		//generateMinefieldDisplay();
 
 		scoreLabel = new JLabel("Score: " + app.getScore());
 		
@@ -107,20 +111,28 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		revealButton.addActionListener(this);
 		
 		JPanel lowerButtonPanel = new JPanel();
-		lowerButtonPanel.add(resetButton);
+        lowerButtonPanel.add(resetButton);
 		lowerButtonPanel.add(revealButton);
-		lowerButtonPanel.add(quitButton);
-		
-		add(scoreLabel, BorderLayout.NORTH);
+        lowerButtonPanel.add(quitButton);
+        
+        JPanel upperPanel = new JPanel();
+        compteur = new Compteur();
+        upperPanel.add(scoreLabel);
+        upperPanel.add(compteur);
+		add(upperPanel, BorderLayout.NORTH);
 		add(demineurPanel, BorderLayout.CENTER);
 		add(lowerButtonPanel, BorderLayout.SOUTH);
 
 		
-	}
+    }
+    
+    private void initializeMinefieldDisplay(){
+        demineurPanel = new JPanel();
+        generateMinefieldDisplay();
+    }
 	
 	private void generateMinefieldDisplay() {
 		int currentDim = app.getChamp().GetDim(app.getLevel());
-		demineurPanel = new JPanel();
 		demineurPanelCases = new Case[currentDim][currentDim];
 		demineurPanel.setLayout(new GridLayout(currentDim,currentDim));
 		
@@ -154,15 +166,17 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	}
 	
 	protected void onDeath() {
-		final ImageIcon deathIcon = new ImageIcon("img/death.png");
-		JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
-		updatePanelGodMode();
+        compteur.stopTimer();
+        final ImageIcon deathIcon = new ImageIcon("img/death.png");
+        JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
+        updatePanelGodMode();
 	}
 	
 	private void newGame(Level difficulty) {
 		demineurPanel.removeAll();
-		app.newGame(difficulty);
-		generateMinefieldDisplay();
+        app.newDifficulty(difficulty);
+        initializeMinefieldDisplay();
+		//generateMinefieldDisplay();
 		app.pack();
 	}
 
@@ -195,9 +209,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		}
 		
 		if(e.getSource()==resetButton || e.getSource()==menuReset) {
-			app.reset();
-			resetMinefieldDisplay();
-			updateScoreLabel();
+			guiReset();
 		}
 		
 		if(e.getSource()==revealButton) {
@@ -209,4 +221,16 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		}
 		
 	}
+
+    private void guiReset(){
+        app.reset();
+        resetMinefieldDisplay();
+        updateScoreLabel();
+        compteur.resetTimer();
+    }
+
+    public Compteur getCompteur() {
+        return compteur;
+    }
+
 }

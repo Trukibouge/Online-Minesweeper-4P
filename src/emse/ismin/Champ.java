@@ -18,7 +18,9 @@ public class Champ {
 	private boolean[][] scoreCalculatedPositions;
 	
 	private int mineNumber;
-	
+    
+    private Level difficulty;
+    
 	final private static int NBMINESEASY = 5;
 	final private static int NBMINESMEDIUM = 20;
 	final private static int NBMINESHARD = 80;
@@ -58,6 +60,7 @@ public class Champ {
 	}
 	
 	public Champ(Level difficulty) {
+        this.difficulty = difficulty;
 		switch(difficulty) {
 		case EASY:
 			initChamp(DIMEASY,DIMEASY);
@@ -82,8 +85,6 @@ public class Champ {
 		case CUSTOM:
 			break;
 		}
-		
-
 	}
 	
 	private void initChamp(int x, int y) {
@@ -176,7 +177,8 @@ public class Champ {
 	}
 	
 	public void displayDebug() {
-		System.out.println(this.toString(true));
+        System.out.println(this.toString(true));
+        System.out.println("Difficulty: " + this.difficulty.toString());
 	}
 	
 	public String getCloseMines(int x, int y) {
@@ -210,5 +212,10 @@ public class Champ {
 		return(minefieldState[x][y]);
 	}
 
+    public void newGame(){
+        placeMines();
+		display();
+		displayDebug();
+    }
 }
 

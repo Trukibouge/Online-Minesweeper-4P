@@ -14,7 +14,7 @@ import javax.swing.*;
 public class Case extends JPanel implements MouseListener {
 	
 	private String text = "?";
-	private final static int caseSize = 50;
+	private final static int CASESIZE = 50;
 	
 	private Demineur app;
 	private int x;
@@ -30,7 +30,7 @@ public class Case extends JPanel implements MouseListener {
 		clicked = false;
 		
 		initializeText();
-		setPreferredSize(new Dimension(caseSize,caseSize));
+		setPreferredSize(new Dimension(CASESIZE,CASESIZE));
 		addMouseListener(this);
 	}
 	
@@ -75,12 +75,13 @@ public class Case extends JPanel implements MouseListener {
 						catch(IOException ex){
 							ex.printStackTrace();
 						}	
-						app.getAppGui().onDeath();
+                        app.getAppGui().onDeath();
+                        repaint();
 					}
 						
 					else {
 						g.setColor(new Color (0,0,0,100));
-						g.drawString(text,25,25);
+						g.drawString(text,getWidth()/2,getHeight()/2);
 						g.fillRect(1, 1, getWidth(), getHeight());
 						updateScore(x,y);
 					}
@@ -89,9 +90,22 @@ public class Case extends JPanel implements MouseListener {
 		}
 		
 		else {
-			g.setColor(new Color (0,0,0,100));
-			g.drawString(text,25,25);
-			g.fillRect(1, 1, getWidth(), getHeight());
+            if(app.getChamp().isMine(x,y)) {
+                try {
+                    BufferedImage image;
+                    image = ImageIO.read(new File("img/death.png"));
+                    g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
+                }
+                catch(IOException ex){
+                    ex.printStackTrace();
+                }	
+            }
+                
+            else {
+                g.setColor(new Color (0,0,0,100));
+                g.drawString(text,getWidth()/2,getHeight()/2);
+                g.fillRect(1, 1, getWidth(), getHeight());
+            }
 		}
 	}
 	
@@ -116,6 +130,11 @@ public class Case extends JPanel implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+        if(!app.isStarted()){
+             app.setStarted(true);
+             app.getAppGui().getCompteur().startTimer();
+        }
+
 		clicked = true;
 		repaint();
 	}

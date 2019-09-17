@@ -12,7 +12,17 @@ public class Demineur extends JFrame {
 	private Level defaultLevel = Level.MEDIUM;
 	private int score = 0;
 	private Champ champ = new Champ(defaultLevel);
-	private DemineurGUI appGui;
+    private DemineurGUI appGui;
+    
+    private boolean started = false;
+
+    public void setStarted (boolean started){
+        this.started = started;
+    }
+
+    public boolean isStarted(){
+        return started;
+    }
 	
 	public DemineurGUI getAppGui() {
 		return appGui;
@@ -23,17 +33,12 @@ public class Demineur extends JFrame {
 	 */
 	public Demineur() {
 		super("Demineur");
-		
-		champ.placeMines();
-		champ.display();
-		champ.displayDebug();
-		
+		champ.newGame();
 		appGui = new DemineurGUI(this);
 		setContentPane(appGui);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		pack();
 		setVisible(true);
-		
 	}
 	
 	/**
@@ -66,18 +71,14 @@ public class Demineur extends JFrame {
 	}
 
 	public void reset() {
-		champ.placeMines();
-		champ.display();
-		champ.displayDebug();
+        champ.newGame();
+        started = false;
 		score = 0;
 	}
 	
-	public void newGame(Level difficulty) {
-		champ = new Champ(difficulty);
-		champ.display();
-		champ.displayDebug();
+	public void newDifficulty(Level difficulty) {
+        this.champ = new Champ(difficulty);
 		reset();
-		
 	}
 
 }
