@@ -64,9 +64,10 @@ public class Case extends JPanel implements MouseListener {
 				g.setColor(new Color(158, 158, 158));
 				g.fillRect(1, 1, getWidth(), getHeight());
 			}
-			
+            
 			else {
-					if(app.getChamp().isMine(x,y)) {
+                if(!app.isLost()){
+                    if(app.getChamp().isMine(x,y)) {
 						try {
 							BufferedImage image;
 							image = ImageIO.read(new File("img/death.png"));
@@ -75,8 +76,6 @@ public class Case extends JPanel implements MouseListener {
 						catch(IOException ex){
 							ex.printStackTrace();
 						}	
-                        app.getAppGui().onDeath();
-                        repaint();
 					}
 						
 					else {
@@ -85,7 +84,8 @@ public class Case extends JPanel implements MouseListener {
 						g.fillRect(1, 1, getWidth(), getHeight());
 						updateScore(x,y);
 					}
-						
+                }
+                			
 			}
 		}
 		
@@ -133,6 +133,12 @@ public class Case extends JPanel implements MouseListener {
         if(!app.isStarted()){
              app.setStarted(true);
              app.getAppGui().getCompteur().startTimer();
+        }
+
+        if(!app.isLost()){
+            if(app.getChamp().isMine(x,y)){
+                app.getAppGui().onDeath();
+            }
         }
 
 		clicked = true;

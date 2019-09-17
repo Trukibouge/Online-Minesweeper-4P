@@ -9,12 +9,13 @@ import javax.swing.JPanel;
  */
 public class Demineur extends JFrame {
 	
-	private Level defaultLevel = Level.MEDIUM;
+	private Level difficulty = Level.MEDIUM;
 	private int score = 0;
-	private Champ champ = new Champ(defaultLevel);
+	private Champ champ = new Champ(difficulty);
     private DemineurGUI appGui;
     
     private boolean started = false;
+    private boolean lost = false;
 
     public void setStarted (boolean started){
         this.started = started;
@@ -59,7 +60,7 @@ public class Demineur extends JFrame {
 	}
 	
 	public Level getLevel() {
-		return(defaultLevel);
+		return(difficulty);
 	}
 	
 	public int getScore() {
@@ -73,12 +74,22 @@ public class Demineur extends JFrame {
 	public void reset() {
         champ.newGame();
         started = false;
+        lost = false;
 		score = 0;
 	}
 	
 	public void newDifficulty(Level difficulty) {
+        this.difficulty = difficulty;
         this.champ = new Champ(difficulty);
 		reset();
 	}
+
+    public boolean isLost() {
+        return lost;
+    }
+
+    public void setLost(boolean lost) {
+        this.lost = lost;
+    }
 
 }

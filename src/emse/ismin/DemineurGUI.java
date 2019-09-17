@@ -135,7 +135,6 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		int currentDim = app.getChamp().GetDim(app.getLevel());
 		demineurPanelCases = new Case[currentDim][currentDim];
 		demineurPanel.setLayout(new GridLayout(currentDim,currentDim));
-		
 		for(int i = 0; i < currentDim; i++) {
 			for(int j = 0; j < currentDim; j++) {
 				demineurPanelCases[i][j] = new Case(app, i, j);	
@@ -170,13 +169,13 @@ public class DemineurGUI extends JPanel implements ActionListener {
         final ImageIcon deathIcon = new ImageIcon("img/death.png");
         JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
         updatePanelGodMode();
-	}
+        app.setLost(true);
+    }
 	
 	private void newGame(Level difficulty) {
 		demineurPanel.removeAll();
         app.newDifficulty(difficulty);
-        initializeMinefieldDisplay();
-		//generateMinefieldDisplay();
+		generateMinefieldDisplay();
 		app.pack();
 	}
 
