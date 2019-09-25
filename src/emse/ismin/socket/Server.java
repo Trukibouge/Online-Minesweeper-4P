@@ -47,14 +47,25 @@ public class Server extends JFrame implements Runnable {
             Socket socket = socketManager.accept(); //new client
             DataInputStream input = new DataInputStream(socket.getInputStream());
             DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-            String playerNick = input.readUTF() ;
+            String playerNick;
+            playerNick = input.readUTF() ;
             gui.addMsg(playerNick + " connected");
             playerNb++;
-            output.writeInt(playerNb);
+
 
             inputStreamMap.put(playerNick, input);
             outputStreamMap.put(playerNick, output);
-            
+
+            // output.writeUTF(playerNick + " has joined the game!");
+            // output.writeUTF("Current number of players: " + Integer.toString(playerNb));
+
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(0);
+                entry.getValue().writeUTF(playerNick + " has joined the game!");
+                
+                entry.getValue().writeInt(0);
+                entry.getValue().writeUTF("Current number of players: " + Integer.toString(playerNb));
+            }
         } 
         
         catch (IOException e) {
@@ -76,5 +87,5 @@ public class Server extends JFrame implements Runnable {
         new Server();
     }
 
-
+    
 }

@@ -21,10 +21,18 @@ import javax.swing.JPanel;
  * @author Truki
  * @version 0.1, 2019/9/3
  */
-public class Demineur extends JFrame {
+public class Demineur extends JFrame implements Runnable {
     
     public static int PORT = 10000;
     public static String HOSTNAME = "localhost";
+    public static int MSG = 0;
+    public static int POS = 1;
+    public static int START = 2;
+    public static int END = 3;
+
+    private Thread process;
+    private DataOutputStream output;
+    private DataInputStream input;
 
 	private Level difficulty = Level.MEDIUM;
 	private int score = 0;
@@ -168,8 +176,11 @@ public class Demineur extends JFrame {
             output.writeUTF(nickName);
             System.out.println("Connected!");
             appGui.addMsg("Connected to " + hostName + ":" + port + " as " + nickName);
-            int playerNb = input.readInt();
-            appGui.addMsg("Player number: " + playerNb);
+
+            String serverMessage = input.readUTF();
+            appGui.addMsg(serverMessage);
+
+            process = new Thread(this);
         }
 
         catch(UnknownHostException e){
@@ -181,6 +192,60 @@ public class Demineur extends JFrame {
             e.printStackTrace();
         }
         
+    }
+
+    private void listen(){
+        try {
+            String serverMessage = input.readUTF();
+            appGui.addMsg(serverMessage);
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void run(){
+        try{
+            while(process != null){
+                int cmd = input.readInt();
+                if(cmd == Demineur.MSG){
+                    String msg = input.readUTF();
+                    appGui.addMsg(msg);
+                }
+    
+                else if(cmd == Demineur.POS){
+    
+                } 
+    
+                else if(cmd == Demineur.START){
+    
+                }
+    
+                else if(cmd == Demineur.END){
+    
+                }
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+
+    // public void run(){
+    //     listen();
+    //     new Thread(this).start(); //start waiting for new client
+    // }
+
+    // public void run(){
+    //     while(process != null){
+    //         int cmd = input.readInt();
+    //         if(cmd == Demineur.MSG){
+    //             String msg = in.readInt();
+    //             appGui.addMsg(msg);
+    //         }
+    //     }
 
     }
 }
