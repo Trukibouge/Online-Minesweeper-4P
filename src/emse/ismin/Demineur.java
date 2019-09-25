@@ -1,10 +1,16 @@
 package emse.ismin;
 
+import java.net.*;
+import java.io.*;
+
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -16,8 +22,11 @@ import javax.swing.JPanel;
  * @version 0.1, 2019/9/3
  */
 public class Demineur extends JFrame {
-	
-	private Level difficulty = Level.EASY;
+    
+    public static int PORT = 10000;
+    public static String HOSTNAME = "localhost";
+
+	private Level difficulty = Level.MEDIUM;
 	private int score = 0;
 	private Champ champ = new Champ(difficulty);
     private DemineurGUI appGui;
@@ -27,6 +36,10 @@ public class Demineur extends JFrame {
     private boolean lost = false;
     private boolean won = false;
 
+    private static String FILENAME = "scores.dat";
+
+    private int playerNb;
+    
     public void setStarted (boolean started){
         this.started = started;
     }
@@ -121,7 +134,15 @@ public class Demineur extends JFrame {
 
     public void WriteScore(){
         try{
-            FileOutputStream file = new FileOutputStream("scores.dat");
+            Path path = Paths.get(FILENAME);
+
+            if(!Files.exists(path)){
+                for(int i = 0; i<Level.values().length; i++){
+                    //if(difficulty)
+                }
+            }
+
+            FileOutputStream file = new FileOutputStream(FILENAME);
             BufferedOutputStream buffer = new BufferedOutputStream(file);
             DataOutputStream os = new DataOutputStream(buffer);
 
@@ -134,5 +155,32 @@ public class Demineur extends JFrame {
         catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+
+    protected void connect(String hostName, int port, String nickName){
+        System.out.println("Connecting to " + hostName + ":" + port + " as " + nickName);
+
+        try{
+            Socket socket = new Socket(hostName, port);
+            DataOutputStream output =new DataOutputStream(socket.getOutputStream());
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            output.writeUTF(nickName);
+            System.out.println("Connected!");
+            appGui.addMsg("Connected to " + hostName + ":" + port + " as " + nickName);
+            int playerNb = input.readInt();
+            appGui.addMsg("Player number: " + playerNb);
+        }
+
+        catch(UnknownHostException e){
+            e.printStackTrace();
+            appGui.addMsg("Cannot connect to "+ hostName + ":" + port);
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
+        
+
     }
 }

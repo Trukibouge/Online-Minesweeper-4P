@@ -17,28 +17,36 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	private Demineur app;
     JLabel scoreLabel;
     JLabel remainingMinesLabel;
-	private JButton quitButton;
-	private JButton resetButton;
-	private JButton revealButton;
-	private JPanel demineurPanel;
+	private JButton quitButton = new JButton("Quit");
+	private JButton resetButton = new JButton("Reset");
+	private JButton revealButton = new JButton("Cheat");
+    
+    private JPanel demineurPanel;
 	
 	private Case[][] demineurPanelCases;
 	
-	private JMenuBar menuBar;
-	private JMenu menuGame;
-	private JMenu menuAbout;
+	private JMenuBar menuBar = new JMenuBar();
+	private JMenu menuGame = new JMenu("Game");
+	private JMenu menuAbout = new JMenu("About");
 	
-	private JMenuItem menuNewGame;
-	private JMenuItem menuEasy;
-	private JMenuItem menuMedium;
-	private JMenuItem menuHard;
-	private JMenuItem menuImpossible;
-	private JMenuItem menuCustom;
+	private JMenuItem menuNewGame = new JMenu("New Game");
+	private JMenuItem menuEasy = new JMenuItem("Easy", KeyEvent.VK_E);
+	private JMenuItem menuMedium = new JMenuItem("Medium", KeyEvent.VK_M);
+	private JMenuItem menuHard = new JMenuItem("Hard", KeyEvent.VK_H);
+	private JMenuItem menuImpossible = new JMenuItem("Impossible", KeyEvent.VK_I);
+	private JMenuItem menuCustom  = new JMenuItem("Custom", KeyEvent.VK_C);
 	
-	private JMenuItem menuQuit;
-	private JMenuItem menuHelp;
-    private JMenuItem menuReset;
+	private JMenuItem menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
+	private JMenuItem menuHelp= new JMenuItem("Help", KeyEvent.VK_H);
+    private JMenuItem menuReset = new JMenuItem("Reset", KeyEvent.VK_R);
+
+    private JTextField hostTextField = new JTextField(Demineur.HOSTNAME, 10);
+    private JTextField portTextField = new JTextField(String.valueOf(Demineur.PORT), 5);
+    private JTextField nickTextField = new JTextField("Nickname", 10);
+    private JButton connectButton = new JButton("Connect");
     
+    private JTextArea msgArea = new JTextArea(5,50);
+
     private Compteur compteur;
 
 	
@@ -49,25 +57,14 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		this.setLayout(new BorderLayout());
         
         initializeMinefieldDisplay();
-		//generateMinefieldDisplay();
 
-
-		
-		menuBar = new JMenuBar();
-		//Game
-		menuGame = new JMenu("Game");
+        //Game
 		menuBar.add(menuGame);
 		
-		menuNewGame = new JMenu("New Game");
-		menuEasy = new JMenuItem("Easy", KeyEvent.VK_E);
 		menuEasy.addActionListener(this);
-		menuMedium = new JMenuItem("Medium", KeyEvent.VK_M);
 		menuMedium.addActionListener(this);
-		menuHard = new JMenuItem("Hard", KeyEvent.VK_H);
 		menuHard.addActionListener(this);
-		menuImpossible = new JMenuItem("Impossible", KeyEvent.VK_I);
 		menuImpossible.addActionListener(this);
-		menuCustom = new JMenuItem("Custom", KeyEvent.VK_C);
 		menuCustom.addActionListener(this);
 		
 		menuNewGame.add(menuEasy);
@@ -78,23 +75,18 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		
 		menuGame.add(menuNewGame);
 		
-		
-		menuReset = new JMenuItem("Reset", KeyEvent.VK_R);
 		menuReset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, ActionEvent.CTRL_MASK));
 		menuReset.setToolTipText("Reset a game with the current difficulty.");
 		menuReset.addActionListener(this);
 		menuGame.add(menuReset);
 		
-		menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 		menuQuit.setAccelerator((KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK)));
 		menuQuit.addActionListener(this);
 		menuGame.add(menuQuit);
 		
 		//About
-		menuAbout = new JMenu("About");
 		menuBar.add(Box.createGlue());
 		menuBar.add(menuAbout);
-		menuHelp = new JMenuItem("Help", KeyEvent.VK_H);
 		menuAbout.add(menuHelp);
 		menuHelp.addActionListener(this);
 		
@@ -103,27 +95,47 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		
 		app.setJMenuBar(menuBar);
 		
-		quitButton = new JButton("Quit");
 		quitButton.addActionListener(this);
-		resetButton = new JButton("Reset");
 		resetButton.addActionListener(this);
-		
-		revealButton = new JButton("Cheat");
 		revealButton.addActionListener(this);
 		
-		JPanel lowerButtonPanel = new JPanel();
-        lowerButtonPanel.add(resetButton);
-		lowerButtonPanel.add(revealButton);
-        lowerButtonPanel.add(quitButton);
+        JPanel lowerButtonPanel = new JPanel();
+        lowerButtonPanel.setLayout(new BorderLayout());
+        JPanel lowerButtonPanelUpper = new JPanel();
+        JPanel lowerButtonPanelLower = new JPanel();
+
+        lowerButtonPanelUpper.add(resetButton);
+		lowerButtonPanelUpper.add(revealButton);
+        lowerButtonPanelUpper.add(quitButton);
+
+        lowerButtonPanelLower.add(msgArea);
+
+        lowerButtonPanel.add(lowerButtonPanelUpper, BorderLayout.NORTH);
+        lowerButtonPanel.add(lowerButtonPanelLower, BorderLayout.SOUTH);
         
         JPanel upperPanel = new JPanel();
+        upperPanel.setLayout(new BorderLayout());
+
+        JPanel upperPanelUpper = new JPanel();
+        JPanel upperPanelLower = new JPanel();
+
         scoreLabel = new JLabel("Score: " + app.getScore());
         remainingMinesLabel = new JLabel("Remaining squares: " + app.getRemainingSquares());
         compteur = new Compteur();
-        upperPanel.add(scoreLabel);
-        upperPanel.add(remainingMinesLabel);
-        upperPanel.add(scoreLabel);
-        upperPanel.add(compteur);
+        upperPanelUpper.add(scoreLabel);
+        upperPanelUpper.add(remainingMinesLabel);
+        upperPanelUpper.add(scoreLabel);
+        upperPanelUpper.add(compteur);
+
+        connectButton.addActionListener(this);
+        upperPanelLower.add(new JLabel("Server: "));
+        upperPanelLower.add(hostTextField);
+        upperPanelLower.add(portTextField);
+        upperPanelLower.add(nickTextField);
+        upperPanelLower.add(connectButton);
+
+        upperPanel.add(upperPanelUpper, BorderLayout.NORTH);
+        upperPanel.add(upperPanelLower, BorderLayout.SOUTH);
 
 		add(upperPanel, BorderLayout.NORTH);
 		add(demineurPanel, BorderLayout.CENTER);
@@ -171,9 +183,8 @@ public class DemineurGUI extends JPanel implements ActionListener {
 				demineurPanelCases[i][j].godMode();
 			}
 		}
-
 	}
-	
+
 	protected void onDeath() {
         compteur.stopTimer();
         final ImageIcon deathIcon = new ImageIcon("img/death.png");
@@ -237,7 +248,11 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		
 		if (e.getSource() == menuHelp) {
 			JOptionPane.showMessageDialog(null, "HELPPPP");
-		}
+        }
+        
+        if(e.getSource() == connectButton){
+            app.connect(hostTextField.getText(), Integer.valueOf(portTextField.getText()), nickTextField.getText());
+        }
 		
 	}
 
@@ -251,6 +266,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
 
     public Compteur getCompteur() {
         return compteur;
+    }
+
+    protected void addMsg(String str){
+        msgArea.append(str + "\n");
     }
 
 }

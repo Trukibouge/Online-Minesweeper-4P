@@ -178,7 +178,7 @@ public class Champ {
 		Random rdmNumber = new Random();
 		//Reset
 		for(int i = 0; i < minefieldState.length; i++) {
-			for(int j = 0; j < minefieldState[0].length; j++) {
+			for(int j = 0; j < minefieldState[0].length; j++) {                                                                     
 					minefieldState[i][j] = false;
 					scoreCalculatedPositions[i][j] = false;
 			}

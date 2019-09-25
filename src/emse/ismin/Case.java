@@ -107,7 +107,24 @@ public class Case extends JPanel implements MouseListener {
             }
 		}
 	}
-	
+    
+    // private void spread(){
+    //     int xsup = x ==  minefieldState.length - 1 ? minefieldState.length - 1 : x + 1;
+	// 	int xinf = x == 0 ? 0 : x - 1;
+	// 	int ysup = y == minefieldState[0].length - 1 ? minefieldState[0].length - 1 : y + 1;
+	// 	int yinf = y == 0 ? 0 : y - 1;
+		
+	// 	int closeMinesCount = 0;
+		
+	// 	for(int i = xinf; i <= xsup; i++) {
+	// 		for(int j = yinf; j <= ysup; j++) {
+	// 			if( !(i==x && j==y) && minefieldState[i][j]) {
+	// 				closeMinesCount++;
+	// 			}
+	// 		}
+	// 	}
+    // }
+    
 	public void godMode() {
 		god = true;
 		repaint();
