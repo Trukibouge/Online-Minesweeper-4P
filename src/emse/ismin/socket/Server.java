@@ -16,7 +16,7 @@ public class Server extends JFrame implements Runnable {
     private List<String> playerList;
     private Map<String, DataInputStream> inputStreamMap = new HashMap<String, DataInputStream>();
     private Map<String, DataOutputStream> outputStreamMap = new HashMap<String, DataOutputStream>();
-    private Thread processUsers;
+    private ServerSocket socketManager;
 
     public Server(){
         System.out.println("Starting server");
@@ -33,25 +33,39 @@ public class Server extends JFrame implements Runnable {
     protected void startServer(){
         gui.addMsg("Waiting for clients...\n");     
         try {
-            ServerSocket socketManager = new ServerSocket(Demineur.PORT);
-            Socket socket = socketManager.accept();
-            
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-
-            String playerNick = input.readUTF() ;
-            gui.addMsg(playerNick + " connected");
-            playerNb++;
-            output.writeInt(playerNb);
-
-            // output.close();
-            // socket.close();
-            // socketManager.close();
+            socketManager = new ServerSocket(Demineur.PORT);
+            new Thread(this).start();
         } 
         
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void createNewSocket(ServerSocket socketManager){
+        try {
+            Socket socket = socketManager.accept(); //new client
+            DataInputStream input = new DataInputStream(socket.getInputStream());
+            DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+            String playerNick = input.readUTF() ;
+            gui.addMsg(playerNick + " connected");
+            playerNb++;
+            output.writeInt(playerNb);
+
+            inputStreamMap.put(playerNick, input);
+            outputStreamMap.put(playerNick, output);
+            
+        } 
+        
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void run(){
+        createNewSocket(socketManager);
+        new Thread(this).start(); //start waiting for new client
     }
 
     /**
@@ -62,7 +76,5 @@ public class Server extends JFrame implements Runnable {
         new Server();
     }
 
-    public void run(){
 
-    }
 }
