@@ -39,7 +39,8 @@ public class ServerGUI extends JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == startButton){
-            msgArea.append("HEY MAN");
+            addMsg("HEY MAN");
+            
         }
     }
 
