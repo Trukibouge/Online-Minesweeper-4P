@@ -21,10 +21,20 @@ import javax.swing.JPanel;
  * @author Truki
  * @version 0.1, 2019/9/3
  */
-public class Demineur extends JFrame {
+public class Demineur extends JFrame implements Runnable {
     
     public static int PORT = 10000;
     public static String HOSTNAME = "localhost";
+    public static int MSG = 0;
+    public static int POS = 1;
+    public static int START = 2;
+    public static int END = 3;
+
+    private Socket socket;
+    private DataOutputStream outputStream;
+    private DataInputStream inputStream;
+    private Thread process;
+
 
 	private Level difficulty = Level.MEDIUM;
 	private int score = 0;
@@ -65,13 +75,7 @@ public class Demineur extends JFrame {
 		setVisible(true);
 	}
 	
-	/**
-	 * 
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		new Demineur();
-	}
+
 	
 	public void quit() {
 		System.out.println("Exiting app...");
@@ -162,14 +166,13 @@ public class Demineur extends JFrame {
         System.out.println("Connecting to " + hostName + ":" + port + " as " + nickName);
 
         try{
-            Socket socket = new Socket(hostName, port);
-            DataOutputStream output =new DataOutputStream(socket.getOutputStream());
-            DataInputStream input = new DataInputStream(socket.getInputStream());
-            output.writeUTF(nickName);
-            System.out.println("Connected!");
+            socket = new Socket(hostName, port);
+            outputStream =new DataOutputStream(socket.getOutputStream());
+            inputStream = new DataInputStream(socket.getInputStream());
+            outputStream.writeUTF(nickName);
             appGui.addMsg("Connected to " + hostName + ":" + port + " as " + nickName);
-            int playerNb = input.readInt();
-            appGui.addMsg("Player number: " + playerNb);
+
+            process = new Thread(this);
         }
 
         catch(UnknownHostException e){
@@ -180,7 +183,38 @@ public class Demineur extends JFrame {
         catch(IOException e){
             e.printStackTrace();
         }
-        
+
+        System.out.println("Start thread");
+        process.start();
+    }
+
+    private void listen(){
+        try{
+            int cmd = inputStream.readInt();
+            System.out.println(cmd);
+            if(cmd == Demineur.MSG){
+                appGui.addMsg(inputStream.readUTF());
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
 
     }
+
+    public void run(){
+        while(process != null){
+            System.out.println("Starting to listen man");
+            listen();
+        }
+    }
+
+    /**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new Demineur();
+	}
 }
