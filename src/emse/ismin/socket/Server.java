@@ -58,6 +58,8 @@ public class Server extends JFrame implements Runnable {
 
             sendMsgToAll(playerNick + " has joined the game!");
             sendMsgToAll("Current number of players: " + Integer.toString(playerNb));
+
+            listenForMsg(playerNick);
         } 
         
         catch (IOException e) {
@@ -67,6 +69,7 @@ public class Server extends JFrame implements Runnable {
     }
 
     private void sendMsgToAll(String msg){
+        gui.addMsg("Sending to all: " + msg);
         try{
             for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
                 entry.getValue().writeInt(0);
@@ -83,6 +86,26 @@ public class Server extends JFrame implements Runnable {
     public void run(){
         createNewSocket(socketManager);
         new Thread(this).start(); //start waiting for new client
+    }
+
+    public void listenForMsg(String playerNick){
+        Thread listener = new Thread(new Runnable(){
+            public void run(){
+                try{
+                    int cmd = inputStreamMap.get(playerNick).readInt();
+                    System.out.println(cmd);
+                    if(cmd == Demineur.MSG){
+                        sendMsgToAll(playerNick + ": " + inputStreamMap.get(playerNick).readUTF());
+                    }
+                    new Thread(this).start();
+                }
+
+                catch(IOException e){
+
+                }
+            }
+        });
+        listener.start();
     }
 
     /**
