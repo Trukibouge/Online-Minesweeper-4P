@@ -210,6 +210,16 @@ public class Demineur extends JFrame implements Runnable {
         }
     }
 
+    protected void sendMsg(String msg){
+        try{
+            outputStream.writeUTF(msg);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+       
+
     /**
 	 * 
 	 * @param args

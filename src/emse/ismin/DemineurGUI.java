@@ -47,6 +47,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
     
     private JTextArea msgArea = new JTextArea(5,50);
 
+    private JTextField chatBox = new JTextField(">", 50);
+    private JButton sendButton = new JButton("Send");
+
     private Compteur compteur;
 
 	
@@ -107,8 +110,14 @@ public class DemineurGUI extends JPanel implements ActionListener {
         lowerButtonPanelUpper.add(resetButton);
 		lowerButtonPanelUpper.add(revealButton);
         lowerButtonPanelUpper.add(quitButton);
+        lowerButtonPanelLower.setLayout(new BorderLayout());
 
-        lowerButtonPanelLower.add(msgArea);
+        lowerButtonPanelLower.add(msgArea, BorderLayout.NORTH);
+        JPanel lowerButtonPanelLowerLower = new JPanel();
+        lowerButtonPanelLowerLower.add(chatBox);
+        lowerButtonPanelLowerLower.add(sendButton);
+        sendButton.addActionListener(this);
+        lowerButtonPanelLower.add(lowerButtonPanelLowerLower, BorderLayout.SOUTH);
 
         lowerButtonPanel.add(lowerButtonPanelUpper, BorderLayout.NORTH);
         lowerButtonPanel.add(lowerButtonPanelLower, BorderLayout.SOUTH);
@@ -252,6 +261,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
         
         if(e.getSource() == connectButton){
             app.connect(hostTextField.getText(), Integer.valueOf(portTextField.getText()), nickTextField.getText());
+        }
+
+        if(e.getSource() == sendButton){
+            app.sendMsg(chatBox.getText());
         }
 		
 	}

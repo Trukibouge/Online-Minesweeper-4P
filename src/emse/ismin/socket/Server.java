@@ -56,16 +56,25 @@ public class Server extends JFrame implements Runnable {
             inputStreamMap.put(playerNick, input);
             outputStreamMap.put(playerNick, output);
 
-            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
-                entry.getValue().writeInt(0);
-                entry.getValue().writeUTF(playerNick + " has joined the game!");
-                
-                entry.getValue().writeInt(0);
-                entry.getValue().writeUTF("Current number of players: " + Integer.toString(playerNb));
-            }
+            sendMsgToAll(playerNick + " has joined the game!");
+            sendMsgToAll("Current number of players: " + Integer.toString(playerNb));
         } 
         
         catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void sendMsgToAll(String msg){
+        try{
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(0);
+                entry.getValue().writeUTF(msg);
+            }
+        }
+
+        catch(IOException e){
             e.printStackTrace();
         }
 
