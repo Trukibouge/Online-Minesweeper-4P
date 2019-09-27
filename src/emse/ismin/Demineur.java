@@ -203,6 +203,17 @@ public class Demineur extends JFrame implements Runnable {
 
     }
 
+    
+    protected void sendMsg(String msg){
+        try{
+            outputStream.writeInt(Demineur.MSG);
+            outputStream.writeUTF(msg);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
     public void run(){
         while(process != null){
             System.out.println("Starting to listen man");
@@ -210,14 +221,6 @@ public class Demineur extends JFrame implements Runnable {
         }
     }
 
-    protected void sendMsg(String msg){
-        try{
-            outputStream.writeUTF(msg);
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-    }
        
 
     /**
