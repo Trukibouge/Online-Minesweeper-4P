@@ -264,7 +264,8 @@ public class DemineurGUI extends JPanel implements ActionListener {
         }
 
         if(e.getSource() == sendButton){
-            app.sendMsg(chatBox.getText());
+            app.sendMsg(chatBox.getText().replace(">", ""));
+            chatBox.setText(">");
         }
 		
 	}

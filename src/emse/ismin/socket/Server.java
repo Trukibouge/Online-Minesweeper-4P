@@ -59,7 +59,7 @@ public class Server extends JFrame implements Runnable {
             sendMsgToAll(playerNick + " has joined the game!");
             sendMsgToAll("Current number of players: " + Integer.toString(playerNb));
 
-            listenForMsg(playerNick);
+            listen(playerNick);
         } 
         
         catch (IOException e) {
@@ -88,7 +88,7 @@ public class Server extends JFrame implements Runnable {
         new Thread(this).start(); //start waiting for new client
     }
 
-    public void listenForMsg(String playerNick){
+    public void listen(String playerNick){
         Thread listener = new Thread(new Runnable(){
             public void run(){
                 try{

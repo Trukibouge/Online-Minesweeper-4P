@@ -13,7 +13,11 @@ import javax.swing.*;
 
 public class Case extends JPanel implements MouseListener {
 	
-	private String text = "?";
+	/**
+     *
+     */
+    private static final long serialVersionUID = 6544968331371366303L;
+    private String text = "?";
 	private final static int CASESIZE = 50;
 	
 	private Demineur app;
@@ -173,7 +177,6 @@ public class Case extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -184,7 +187,6 @@ public class Case extends JPanel implements MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 	
