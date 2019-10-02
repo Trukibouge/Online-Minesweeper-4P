@@ -31,9 +31,7 @@ public class Server extends JFrame implements Runnable {
 
     public Server(){
         System.out.println("Starting server");
-
-        
-
+        champ.newGame();
         gui = new ServerGUI(this);
         setContentPane(gui);
         pack();
@@ -133,7 +131,10 @@ public class Server extends JFrame implements Runnable {
                         sendMsgToAll(Demineur.MSG, playerNick + ": " + inMsg);
                     }
                     else if(cmd == Demineur.POS){
-
+                        int x = inputStreamMap.get(playerNick).readInt();
+                        int y = inputStreamMap.get(playerNick).readInt();
+                        int nb = inputStreamMap.get(playerNick).readInt();
+                        System.out.println("Got message from player nb." + nb + ": " + x + "/" + y);
                     }
                     
                     new Thread(this).start();

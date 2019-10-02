@@ -205,7 +205,7 @@ public class Demineur extends JFrame implements Runnable {
 
             else if(cmd == Demineur.PLAYERNB){
                 playerNb = inputStream.readInt();
-                appGui.addMsg("Your number: " + Integer.toString(playerNb));
+                appGui.addMsg("Your number: " + playerNb);
             }
         }
 
@@ -217,6 +217,7 @@ public class Demineur extends JFrame implements Runnable {
 
     protected void sendPos(int x, int y){
         try{
+            System.out.println("Sending position to server: " + x + "/" + y);
             outputStream.writeInt(Demineur.POS);
             outputStream.writeInt(x);
             outputStream.writeInt(y);
@@ -229,6 +230,7 @@ public class Demineur extends JFrame implements Runnable {
     
     protected void sendMsg(String msg){
         try{
+            System.out.println("Sending message to server: " + msg);
             outputStream.writeInt(Demineur.MSG);
             outputStream.writeUTF(msg);
         }
@@ -253,4 +255,5 @@ public class Demineur extends JFrame implements Runnable {
 	public static void main(String[] args) {
 		new Demineur();
 	}
+
 }

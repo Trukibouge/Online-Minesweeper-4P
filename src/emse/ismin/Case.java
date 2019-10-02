@@ -155,22 +155,24 @@ public class Case extends JPanel implements MouseListener {
         clicked = true;
         repaint();
 
-        if(!app.isStarted()){
-             app.setStarted(true);
-             app.getAppGui().getCompteur().startTimer();
-        }
+        // if(!app.isStarted()){
+        //      app.setStarted(true);
+        //      app.getAppGui().getCompteur().startTimer();
+        // }
 
-        if(!app.isLost() || !app.isWon()){
-            if(app.getChamp().isMine(x,y)){
-                app.getAppGui().onDeath();
-            }
-            else{
-                updateLabels(x,y);
-                if(app.getRemainingSquares() == 0){
-                    app.getAppGui().onWin();
-                }
-            }
-        }
+        // if(!app.isLost() || !app.isWon()){
+        //     if(app.getChamp().isMine(x,y)){
+        //         app.getAppGui().onDeath();
+        //     }
+        //     else{
+        //         updateLabels(x,y);
+        //         if(app.getRemainingSquares() == 0){
+        //             app.getAppGui().onWin();
+        //         }
+        //     }
+        // }
+
+        app.sendPos(x, y);
 
 		repaint();
 	}

@@ -240,8 +240,8 @@ public class Champ {
 
     public void newGame(){
         placeMines();
-		//display();
-		//displayDebug();
+		display();
+		displayDebug();
     }
 }
 
