@@ -72,6 +72,10 @@ public class Server extends JFrame implements Runnable {
             sendMsgToAll(Demineur.MSG, playerNick + " has joined the game!");
             sendMsgToAll(Demineur.MSG, "Current number of players: " + Integer.toString(playerNb));
 
+            gui.addMsg("Attributing player nb to: " + playerNick + " = " + playerNb);
+            output.writeInt(Demineur.PLAYERNB);
+            output.writeInt(playerNb);
+
             listen(playerNick);
         } 
         

@@ -31,6 +31,7 @@ public class Demineur extends JFrame implements Runnable {
     public static int POS = 1;
     public static int START = 2;
     public static int END = 3;
+    public static int PLAYERNB = 4;
 
     private Socket socket;
     private DataOutputStream outputStream;
@@ -201,6 +202,11 @@ public class Demineur extends JFrame implements Runnable {
             else if(cmd == Demineur.START){
                 appGui.addMsg("Gogogo");
             }
+
+            else if(cmd == Demineur.PLAYERNB){
+                playerNb = inputStream.readInt();
+                appGui.addMsg("Your number: " + Integer.toString(playerNb));
+            }
         }
 
         catch(IOException e){
@@ -209,6 +215,17 @@ public class Demineur extends JFrame implements Runnable {
 
     }
 
+    protected void sendPos(int x, int y){
+        try{
+            outputStream.writeInt(Demineur.POS);
+            outputStream.writeInt(x);
+            outputStream.writeInt(y);
+            outputStream.writeInt(playerNb);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
     
     protected void sendMsg(String msg){
         try{
