@@ -202,9 +202,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
         compteur.stopTimer();
         final ImageIcon deathIcon = new ImageIcon("img/death.png");
         JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
-        updatePanelGodMode();
-        app.setLost(true);
-        app.WriteScore();
+        //updatePanelGodMode();
+        //app.setLost(true);
+        //app.WriteScore();
     }
 
     protected void showPopUpMessage(String msg){

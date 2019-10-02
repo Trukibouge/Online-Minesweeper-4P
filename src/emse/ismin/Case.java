@@ -63,7 +63,8 @@ public class Case extends JPanel implements MouseListener {
 			}
             
 			else {
-                if(!app.isLost()){
+                // if(!app.isLost()){
+                if(1==1){
                     if(mine) {
 						try {
 							BufferedImage image;
@@ -169,7 +170,9 @@ public class Case extends JPanel implements MouseListener {
 	public void mousePressed(MouseEvent e) {
         if(app.isConnected()){
             if(app.isStarted()){
-                app.sendPos(x, y);
+                if(!app.isLost()){
+                    app.sendPos(x, y);
+                }
             }
             else{
                 app.getAppGui().showPopUpMessage("The game has not started!!!! >:(");

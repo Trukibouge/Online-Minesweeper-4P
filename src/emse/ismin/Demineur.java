@@ -32,6 +32,7 @@ public class Demineur extends JFrame implements Runnable {
     public static int START = 2;
     public static int END = 3;
     public static int PLAYERNB = 4;
+    public static int DEATH = 5;
 
     private Socket socket;
     private DataOutputStream outputStream;
@@ -223,6 +224,15 @@ public class Demineur extends JFrame implements Runnable {
                 appGui.getDemineurPanelCases()[x][y].setCaseContent(value);
                 appGui.getDemineurPanelCases()[x][y].setPlayer(playerNb);
                 appGui.getDemineurPanelCases()[x][y].cellClicked();
+                if(isMine && playerNb == this.playerNb){
+                    lost = true;
+                    sendDeath();
+                    appGui.onDeath();
+                }
+            }
+
+            else if(cmd == Demineur.END){
+                appGui.addMsg("Received end game");
             }
         }
 
@@ -250,6 +260,16 @@ public class Demineur extends JFrame implements Runnable {
             System.out.println("Sending message to server: " + msg);
             outputStream.writeInt(Demineur.MSG);
             outputStream.writeUTF(msg);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    protected void sendDeath(){
+        try{
+            System.out.println("Sending client death");
+            outputStream.writeInt(Demineur.DEATH);
         }
         catch(IOException e){
             e.printStackTrace();

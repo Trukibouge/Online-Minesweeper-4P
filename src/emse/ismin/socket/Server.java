@@ -31,13 +31,15 @@ public class Server extends JFrame implements Runnable {
      */
     private static final long serialVersionUID = -5822900338130207614L;
     private ServerGUI gui;
-    private int playerNb;
+    private int playerCount;
     private List<String> playerList;
     private Map<String, DataInputStream> inputStreamMap = new HashMap<String, DataInputStream>();
     private Map<String, DataOutputStream> outputStreamMap = new HashMap<String, DataOutputStream>();
     private ServerSocket socketManager;
     private Level serverDifficulty = Level.MEDIUM;
     private Champ champ = new Champ(serverDifficulty);
+
+    private int deathCount = 0;
 
     public Server(){
         System.out.println("Starting server");
@@ -71,18 +73,18 @@ public class Server extends JFrame implements Runnable {
             String playerNick;
             playerNick = input.readUTF() ;
             gui.addMsg(playerNick + " connected");
-            playerNb++;
+            playerCount++;
 
 
             inputStreamMap.put(playerNick, input);
             outputStreamMap.put(playerNick, output);
 
             sendMsgToAll(playerNick + " has joined the game!");
-            sendMsgToAll("Current number of players: " + Integer.toString(playerNb));
+            sendMsgToAll("Current number of players: " + Integer.toString(playerCount));
 
-            gui.addMsg("Attributing player nb to: " + playerNick + " = " + playerNb);
+            gui.addMsg("Attributing player nb to: " + playerNick + " = " + playerCount);
             output.writeInt(Demineur.PLAYERNB);
-            output.writeInt(playerNb);
+            output.writeInt(playerCount);
 
             listen(playerNick);
         } 
@@ -116,6 +118,20 @@ public class Server extends JFrame implements Runnable {
                             sendPosition(x, y, nb);
                         }
                     }
+
+                    else if(cmd == Demineur.DEATH){
+                        System.out.println("Sending death");
+                        gui.addMsg(playerNick + " is dead. Il est NUL techniquement tactiquement.");
+                        sendMsgToAll(playerNick + " is dead. Il est NUL techniquement tactiquement.");
+                        deathCount++;
+                        System.out.println("Death count: " + deathCount);
+                        if(deathCount == playerCount){
+                            System.out.println("Sending end");
+                            gui.addMsg("Vous êtes NULS tactiquement techniquement");
+                            sendMsgToAll("Vous êtes NULS tactiquement techniquement");
+                            sendEnd();
+                        }
+                    }
                     
                     new Thread(this).start();
                 }
@@ -126,6 +142,20 @@ public class Server extends JFrame implements Runnable {
             }
         });
         listener.start();
+    }
+
+    private void sendEnd(){
+        try{
+            gui.addMsg("Sending end to all");
+            System.out.println("Sending end to all");
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(Demineur.END);
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     private void sendPosition(int x, int y, int playerNb){
