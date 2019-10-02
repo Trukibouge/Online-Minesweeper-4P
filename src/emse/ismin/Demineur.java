@@ -5,7 +5,6 @@ import java.io.*;
 
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
-import java.io.EOFException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /**
  * @author Truki
@@ -23,6 +21,10 @@ import javax.swing.JPanel;
  */
 public class Demineur extends JFrame implements Runnable {
     
+    /**
+     *
+     */
+    private static final long serialVersionUID = 3899778202618430188L;
     public static int PORT = 10000;
     public static String HOSTNAME = "localhost";
     public static int MSG = 0;
@@ -194,6 +196,10 @@ public class Demineur extends JFrame implements Runnable {
             System.out.println(cmd);
             if(cmd == Demineur.MSG){
                 appGui.addMsg(inputStream.readUTF());
+            }
+
+            else if(cmd == Demineur.START){
+                appGui.addMsg("Gogogo");
             }
         }
 

@@ -11,6 +11,11 @@ import java.awt.event.ActionListener;
 
 public class ServerGUI extends JPanel implements ActionListener{
     
+    /**
+     *
+     */
+    private static final long serialVersionUID = -399773621255213729L;
+
     private Server server;
 
     private JButton startButton = new JButton("Start");
@@ -39,8 +44,7 @@ public class ServerGUI extends JPanel implements ActionListener{
     @Override
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == startButton){
-            addMsg("HEY MAN");
-            
+            server.sendStart();
         }
     }
 

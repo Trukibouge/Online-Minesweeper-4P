@@ -3,9 +3,8 @@
  */
 
 package emse.ismin;
-import java.util.*;
 
-import javax.swing.Spring;
+import java.util.*;
 
 /**
  * @author Truki
@@ -174,7 +173,7 @@ public class Champ {
 	 * Randomly place mines in the whole field.
 	 * 
 	 */
-	public void placeMines() {
+	private void placeMines() {
 		Random rdmNumber = new Random();
 		//Reset
 		for(int i = 0; i < minefieldState.length; i++) {
@@ -241,8 +240,8 @@ public class Champ {
 
     public void newGame(){
         placeMines();
-		display();
-		displayDebug();
+		//display();
+		//displayDebug();
     }
 }
 

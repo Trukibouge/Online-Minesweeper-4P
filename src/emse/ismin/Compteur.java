@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
@@ -13,6 +12,10 @@ import javax.swing.JPanel;
 
 public class Compteur extends JPanel implements Runnable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 6323791352452768050L;
     final private static int WIDTH = 35;
     final private static int HEIGHT = 25;
 

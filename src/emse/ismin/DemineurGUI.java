@@ -14,7 +14,11 @@ import javax.swing.*;
  */
 public class DemineurGUI extends JPanel implements ActionListener {
 
-	private Demineur app;
+	/**
+     *
+     */
+    private static final long serialVersionUID = -5812139900233662210L;
+    private Demineur app;
     JLabel scoreLabel;
     JLabel remainingMinesLabel;
 	private JButton quitButton = new JButton("Quit");
