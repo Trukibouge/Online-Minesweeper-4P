@@ -14,7 +14,8 @@ import java.util.*;
 public class Champ {
 	
 	private boolean[][] minefieldState;
-	private boolean[][] scoreCalculatedPositions;
+    private boolean[][] scoreCalculatedPositions;
+    private int[][] playerClickState;
 	
 	private int mineNumber;
     
@@ -115,7 +116,8 @@ public class Champ {
 	
 	private void initChamp(int x, int y) {
 		minefieldState = new boolean[x][y]; 
-		scoreCalculatedPositions = new boolean[x][y];
+        scoreCalculatedPositions = new boolean[x][y];
+        playerClickState = new int[x][y];
 	}
 	
 	public Champ(int dimx, int dimy) {
@@ -179,7 +181,8 @@ public class Champ {
 		for(int i = 0; i < minefieldState.length; i++) {
 			for(int j = 0; j < minefieldState[0].length; j++) {                                                                     
 					minefieldState[i][j] = false;
-					scoreCalculatedPositions[i][j] = false;
+                    scoreCalculatedPositions[i][j] = false;
+                    playerClickState[i][j] = 0;
 			}
 		}
 		
@@ -243,5 +246,19 @@ public class Champ {
 		display();
 		displayDebug();
     }
+
+    public int[][] getPlayerClickState() {
+        return playerClickState;
+    }
+
+    public boolean updateClickState(int x, int y, int nb){
+        boolean updated = false;
+        if(playerClickState[x][y] == 0){
+            playerClickState[x][y] = nb;
+            updated = true;
+        }
+        return updated;
+    }
+
 }
 

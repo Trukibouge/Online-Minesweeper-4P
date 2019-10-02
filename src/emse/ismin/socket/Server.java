@@ -11,8 +11,18 @@ import emse.ismin.Demineur;
 import emse.ismin.Level;
 import emse.ismin.Champ;
 
-//1 go
-//2 clic
+//Collection 1
+//Bonus 5
+//Deconnexion (bonus)
+//IHM (bonus)
+//Score (bonus)
+//Chat (bonus)
+//Couleurs 2
+//Solo 4
+//Niveau Solo 2
+//Fichier 1
+//Réseau: nombre de clients infini 1, position 2, fin de partie 1, affichage couleur 2   
+//Commentaires 1 Javadoc 1 
 
 public class Server extends JFrame implements Runnable {
 
@@ -67,8 +77,8 @@ public class Server extends JFrame implements Runnable {
             inputStreamMap.put(playerNick, input);
             outputStreamMap.put(playerNick, output);
 
-            sendMsgToAll(Demineur.MSG, playerNick + " has joined the game!");
-            sendMsgToAll(Demineur.MSG, "Current number of players: " + Integer.toString(playerNb));
+            sendMsgToAll(playerNick + " has joined the game!");
+            sendMsgToAll("Current number of players: " + Integer.toString(playerNb));
 
             gui.addMsg("Attributing player nb to: " + playerNick + " = " + playerNb);
             output.writeInt(Demineur.PLAYERNB);
@@ -83,41 +93,7 @@ public class Server extends JFrame implements Runnable {
 
     }
 
-    private void sendMsgToAll(int nature, String msg){
-        try{
-            if(nature == Demineur.MSG){
-                gui.addMsg("Sending message to all: " + msg);
-                System.out.println("Sending message to all: " + msg);
-                for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
-                    entry.getValue().writeInt(Demineur.MSG);
-                    entry.getValue().writeUTF(msg);
-                }
-            }
 
-            else if(nature == Demineur.START){
-                gui.addMsg("Sending start to all");
-                System.out.println("Sending start to all");
-                for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
-                    entry.getValue().writeInt(Demineur.START);
-                }
-            }
-
-        }
-
-        catch(IOException e){
-            e.printStackTrace();
-        }
-
-    }
-
-    public void sendStart(){
-        sendMsgToAll(Demineur.START, "");
-    }
-
-    public void run(){
-        createNewSocket(socketManager);
-        new Thread(this).start(); //start waiting for new client
-    }
 
     public void listen(String playerNick){
         Thread listener = new Thread(new Runnable(){
@@ -128,13 +104,17 @@ public class Server extends JFrame implements Runnable {
                     if(cmd == Demineur.MSG){
                         String inMsg = inputStreamMap.get(playerNick).readUTF();
                         System.out.println("Got msg from " + playerNick + ": " + inMsg);
-                        sendMsgToAll(Demineur.MSG, playerNick + ": " + inMsg);
+                        sendMsgToAll(playerNick + ": " + inMsg);
                     }
                     else if(cmd == Demineur.POS){
                         int x = inputStreamMap.get(playerNick).readInt();
                         int y = inputStreamMap.get(playerNick).readInt();
                         int nb = inputStreamMap.get(playerNick).readInt();
                         System.out.println("Got message from player nb." + nb + ": " + x + "/" + y);
+                        boolean updated = champ.updateClickState(x,y,nb);
+                        if(updated){
+                            sendPosition(x, y, nb);
+                        }
                     }
                     
                     new Thread(this).start();
@@ -146,6 +126,60 @@ public class Server extends JFrame implements Runnable {
             }
         });
         listener.start();
+    }
+
+    private void sendPosition(int x, int y, int playerNb){
+        try{
+            gui.addMsg("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
+            System.out.println("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(Demineur.POS);
+                entry.getValue().writeInt(x);
+                entry.getValue().writeInt(y);
+                entry.getValue().writeInt(playerNb);
+                entry.getValue().writeUTF(champ.getCloseMines(x, y));
+                entry.getValue().writeBoolean(champ.isMine(x, y));
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    private void sendMsgToAll(String msg){
+        try{
+            gui.addMsg("Sending message to all: " + msg);
+            System.out.println("Sending message to all: " + msg);
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(Demineur.MSG);
+                entry.getValue().writeUTF(msg);
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public void sendStart(){
+        try{
+            gui.addMsg("Sending start to all");
+            System.out.println("Sending start to all");
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(Demineur.START);
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void run(){
+        createNewSocket(socketManager);
+        new Thread(this).start(); //start waiting for new client
     }
 
     /**

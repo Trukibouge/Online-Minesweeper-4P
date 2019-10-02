@@ -52,6 +52,8 @@ public class Demineur extends JFrame implements Runnable {
     private static String FILENAME = "scores.dat";
 
     private int playerNb;
+
+    private boolean connected = false;
     
     public void setStarted (boolean started){
         this.started = started;
@@ -70,7 +72,7 @@ public class Demineur extends JFrame implements Runnable {
 	 */
 	public Demineur() {
 		super("Demineur");
-		champ.newGame();
+		//champ.newGame();
 		appGui = new DemineurGUI(this);
 		setContentPane(appGui);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -174,6 +176,7 @@ public class Demineur extends JFrame implements Runnable {
             inputStream = new DataInputStream(socket.getInputStream());
             outputStream.writeUTF(nickName);
             appGui.addMsg("Connected to " + hostName + ":" + port + " as " + nickName);
+            connected = true;
 
             process = new Thread(this);
         }
@@ -201,11 +204,25 @@ public class Demineur extends JFrame implements Runnable {
 
             else if(cmd == Demineur.START){
                 appGui.addMsg("Gogogo");
+                started = true;
+                appGui.getCompteur().startTimer();
             }
 
             else if(cmd == Demineur.PLAYERNB){
                 playerNb = inputStream.readInt();
                 appGui.addMsg("Your number: " + playerNb);
+            }
+
+            else if(cmd == Demineur.POS){
+                int x = inputStream.readInt();
+                int y = inputStream.readInt();
+                int playerNb = inputStream.readInt();
+                String value = inputStream.readUTF();
+                boolean isMine = inputStream.readBoolean();
+                appGui.getDemineurPanelCases()[x][y].setMine(isMine);
+                appGui.getDemineurPanelCases()[x][y].setCaseContent(value);
+                appGui.getDemineurPanelCases()[x][y].setPlayer(playerNb);
+                appGui.getDemineurPanelCases()[x][y].cellClicked();
             }
         }
 
@@ -255,5 +272,9 @@ public class Demineur extends JFrame implements Runnable {
 	public static void main(String[] args) {
 		new Demineur();
 	}
+
+    public boolean isConnected() {
+        return connected;
+    }
 
 }

@@ -17,7 +17,7 @@ public class Case extends JPanel implements MouseListener {
      *
      */
     private static final long serialVersionUID = 6544968331371366303L;
-    private String text = "?";
+    private String caseContent = "?";
 	private final static int CASESIZE = 50;
 	
 	private Demineur app;
@@ -25,7 +25,11 @@ public class Case extends JPanel implements MouseListener {
 	private int y;
 	
 	private boolean clicked = false;
-	private boolean god = false;
+    private boolean god = false;
+    private boolean mine = false;
+    private int player = 0;
+    private Color cellColor;
+    private Color whiteColor = new Color(255,255,255);
 	
 	public Case(Demineur app, int x, int y) {
 		this.app = app;
@@ -33,27 +37,16 @@ public class Case extends JPanel implements MouseListener {
 		this.y = y;
 		clicked = false;
 		
-		initializeText();
 		setPreferredSize(new Dimension(CASESIZE,CASESIZE));
 		addMouseListener(this);
 	}
 	
 	public void setText(String text) {
-		this.text = text;
-	}
-	
-	private void initializeText() {
-		if(!app.getChamp().isMine(x,y)) {
-			text = app.getChamp().getCloseMines(x,y);
-		}
-
-		else {
-			text = "x";
-		}
+		this.caseContent = text;
 	}
 	
 	public void resetCase() {
-		initializeText();
+		caseContent = "?";
 		clicked = false;
 		god = false;
 		repaint();
@@ -71,7 +64,7 @@ public class Case extends JPanel implements MouseListener {
             
 			else {
                 if(!app.isLost()){
-                    if(app.getChamp().isMine(x,y)) {
+                    if(mine) {
 						try {
 							BufferedImage image;
 							image = ImageIO.read(new File("img/death.png"));
@@ -83,15 +76,17 @@ public class Case extends JPanel implements MouseListener {
 					}
 						
 					else {
-						g.setColor(new Color (0,0,0,100));
-						g.drawString(text,getWidth()/2,getHeight()/2);
-						g.fillRect(1, 1, getWidth(), getHeight());
+                        g.setColor(cellColor);
+                        g.fillRect(1, 1, getWidth(), getHeight());
+                        g.setColor(whiteColor);
+                        g.drawString(caseContent,getWidth()/2,getHeight()/2);
 					}
                 }
                 			
 			}
 		}
-		
+        
+        //god mode
 		else {
             if(app.getChamp().isMine(x,y)) {
                 try {
@@ -106,7 +101,7 @@ public class Case extends JPanel implements MouseListener {
                 
             else {
                 g.setColor(new Color (0,0,0,100));
-                g.drawString(text,getWidth()/2,getHeight()/2);
+                g.drawString(caseContent,getWidth()/2,getHeight()/2);
                 g.fillRect(1, 1, getWidth(), getHeight());
             }
 		}
@@ -128,6 +123,8 @@ public class Case extends JPanel implements MouseListener {
 	// 		}
 	// 	}
     // }
+
+
     
 	public void godMode() {
 		god = true;
@@ -135,15 +132,33 @@ public class Case extends JPanel implements MouseListener {
 	}
 		
 	
-	private void updateLabels(int x, int y) {
-		if(!app.getChamp().getScoreCalculatedPositions()[x][y]) {
-			app.getChamp().getScoreCalculatedPositions()[x][y] = true;
-            app.setScore(app.getScore() + Integer.parseInt(app.getChamp().getCloseMines(x,y))*10);
-            app.setRemainingSquares(app.getRemainingSquares() - 1);
-            app.getAppGui().updateScoreLabel();
-            app.getAppGui().updateRemainingMinesLabel();
-		}
-	}
+
+    
+    public void cellClicked(){
+        clicked = true;
+        setCellColor();
+        repaint();
+    }
+
+    public void setCellColor(){
+        switch(player){
+            case 0: //impossible case
+                cellColor = new Color(0,0,0);
+                break;
+            case 1:
+                cellColor = new Color(244, 67, 54);
+                break;
+            case 2:
+                cellColor = new Color(33, 150, 243);
+                break;
+            case 3:
+                cellColor = new Color(76, 175, 80);
+                break;
+            case 4:
+                cellColor = new Color(255, 235, 59);
+                break;
+        }
+    }
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -152,8 +167,20 @@ public class Case extends JPanel implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-        clicked = true;
-        repaint();
+        if(app.isConnected()){
+            if(app.isStarted()){
+                app.sendPos(x, y);
+            }
+            else{
+                app.getAppGui().showPopUpMessage("The game has not started!!!! >:(");
+            }
+        }
+
+        else{
+            app.getAppGui().showPopUpMessage("Please connect to a server.");
+
+        // clicked = true;
+        // repaint();
 
         // if(!app.isStarted()){
         //      app.setStarted(true);
@@ -172,9 +199,9 @@ public class Case extends JPanel implements MouseListener {
         //     }
         // }
 
-        app.sendPos(x, y);
-
-		repaint();
+        // repaint()
+        }
+        
 	}
 
 	@Override
@@ -191,7 +218,35 @@ public class Case extends JPanel implements MouseListener {
 	public void mouseExited(MouseEvent e) {
 		
 	}
-	
 
+    public String getCaseContent() {
+        return caseContent;
+    }
+
+    public void setCaseContent(String caseContent) {
+        this.caseContent = caseContent;
+    }
+
+    public boolean isMine() {
+        return mine;
+    }
+
+    public void setMine(boolean mine) {
+        this.mine = mine;
+    }
+
+    public void setPlayer(int player) {
+        this.player = player;
+    }
+	
+    private void updateLabels(int x, int y) {
+		if(!app.getChamp().getScoreCalculatedPositions()[x][y]) {
+			app.getChamp().getScoreCalculatedPositions()[x][y] = true;
+            app.setScore(app.getScore() + Integer.parseInt(app.getChamp().getCloseMines(x,y))*10);
+            app.setRemainingSquares(app.getRemainingSquares() - 1);
+            app.getAppGui().updateScoreLabel();
+            app.getAppGui().updateRemainingMinesLabel();
+		}
+    }
 
 }

@@ -207,6 +207,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
         app.WriteScore();
     }
 
+    protected void showPopUpMessage(String msg){
+        JOptionPane.showMessageDialog(null, msg);
+    }
+
     protected void onWin(){
         compteur.stopTimer();
         final ImageIcon winIcon = new ImageIcon("img/win.jpg");
@@ -288,6 +292,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
 
     protected void addMsg(String str){
         msgArea.append(str + "\n");
+    }
+
+    public Case[][] getDemineurPanelCases() {
+        return demineurPanelCases;
     }
 
 }
