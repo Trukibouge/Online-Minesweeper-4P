@@ -38,6 +38,7 @@ public class Server extends JFrame implements Runnable {
     private ServerSocket socketManager;
     private Level serverDifficulty = Level.MEDIUM;
     private Champ champ = new Champ(serverDifficulty);
+    private int remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty);
 
     private int deathCount = 0;
 
@@ -108,6 +109,7 @@ public class Server extends JFrame implements Runnable {
                         System.out.println("Got msg from " + playerNick + ": " + inMsg);
                         sendMsgToAll(playerNick + ": " + inMsg);
                     }
+
                     else if(cmd == Demineur.POS){
                         int x = inputStreamMap.get(playerNick).readInt();
                         int y = inputStreamMap.get(playerNick).readInt();
@@ -116,6 +118,10 @@ public class Server extends JFrame implements Runnable {
                         boolean updated = champ.updateClickState(x,y,nb);
                         if(updated){
                             sendPosition(x, y, nb);
+                            remainingSquares--;
+                            if(remainingSquares == 0){
+                                sendEnd();
+                            }
                         }
                     }
 
@@ -169,6 +175,7 @@ public class Server extends JFrame implements Runnable {
                 entry.getValue().writeInt(playerNb);
                 entry.getValue().writeUTF(champ.getCloseMines(x, y));
                 entry.getValue().writeBoolean(champ.isMine(x, y));
+                entry.getValue().writeInt(remainingSquares);
             }
         }
 

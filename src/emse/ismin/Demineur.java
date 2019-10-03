@@ -220,6 +220,8 @@ public class Demineur extends JFrame implements Runnable {
                 int playerNb = inputStream.readInt();
                 String value = inputStream.readUTF();
                 boolean isMine = inputStream.readBoolean();
+                remainingSquares = inputStream.readInt();
+                appGui.updateRemainingMinesLabel();
                 appGui.getDemineurPanelCases()[x][y].setMine(isMine);
                 appGui.getDemineurPanelCases()[x][y].setCaseContent(value);
                 appGui.getDemineurPanelCases()[x][y].setPlayer(playerNb);
