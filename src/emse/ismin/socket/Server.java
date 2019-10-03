@@ -87,6 +87,30 @@ public class Server extends JFrame implements Runnable {
             output.writeInt(Demineur.PLAYERNB);
             output.writeInt(playerCount);
 
+            int diffIndex = 1;
+            switch(serverDifficulty){
+                case EASY:
+                diffIndex = 0;
+                    break;
+                    
+                case MEDIUM:
+                diffIndex = 1;
+                    break;
+    
+                case HARD:
+                diffIndex = 2;
+                    break;
+    
+                case IMPOSSIBLE:
+                diffIndex = 3;
+                    break;
+    
+                case CUSTOM:
+                diffIndex = 4;
+                    break;
+            }
+            changeDiff(diffIndex);
+
             listen(playerNick);
         } 
         
@@ -148,6 +172,52 @@ public class Server extends JFrame implements Runnable {
             }
         });
         listener.start();
+    }
+
+    protected void changeDiff(int newDiffIndex){
+        switch(newDiffIndex){
+            case 0:
+            serverDifficulty = Level.EASY;
+                break;
+                
+            case 1:
+            serverDifficulty = Level.MEDIUM;
+                break;
+
+            case 2:
+            serverDifficulty = Level.HARD;
+                break;
+
+            case 3:
+            serverDifficulty = Level.IMPOSSIBLE;
+                break;
+
+            case 4:
+            serverDifficulty = Level.CUSTOM;
+                break;
+        }
+
+        champ = new Champ(serverDifficulty);
+        champ.newGame();
+        remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty);
+        sendDiff(newDiffIndex);
+
+    }
+
+    private void sendDiff(int newDiffIndex){
+        try{
+            gui.addMsg("Changing difficulty to " + newDiffIndex + ", number of mines: " + remainingSquares);
+            System.out.println("Changing difficulty to " + newDiffIndex);
+            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                entry.getValue().writeInt(Demineur.DIFF);
+                entry.getValue().writeInt(newDiffIndex);
+                entry.getValue().writeInt(remainingSquares);
+            }
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     private void sendEnd(){

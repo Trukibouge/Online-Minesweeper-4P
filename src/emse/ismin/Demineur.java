@@ -33,6 +33,7 @@ public class Demineur extends JFrame implements Runnable {
     public static int END = 3;
     public static int PLAYERNB = 4;
     public static int DEATH = 5;
+    public static int DIFF = 6;
 
     private Socket socket;
     private DataOutputStream outputStream;
@@ -55,6 +56,7 @@ public class Demineur extends JFrame implements Runnable {
     private int playerNb;
 
     private boolean connected = false;
+    private boolean netPlay = true;
     
     public void setStarted (boolean started){
         this.started = started;
@@ -105,11 +107,21 @@ public class Demineur extends JFrame implements Runnable {
 	}
 
 	public void reset() {
-        champ.newGame();
-        started = false;
-        lost = false;
-        score = 0;
-        remainingSquares = champ.GetDim(difficulty)*champ.GetDim(difficulty) - champ.getInitialMineNumber(difficulty);
+        if(netPlay == false){
+            champ.newGame();
+            started = false;
+            lost = false;
+            score = 0;
+            remainingSquares = champ.GetDim(difficulty)*champ.GetDim(difficulty) - champ.getInitialMineNumber(difficulty);
+        }
+        
+        else{
+            started = false;
+            lost = false;
+            score = 0;
+            appGui.updateRemainingMinesLabel();
+            appGui.newGame(difficulty);
+        }
 	}
 	
 	public void newDifficulty(Level difficulty) {
@@ -236,6 +248,12 @@ public class Demineur extends JFrame implements Runnable {
             else if(cmd == Demineur.END){
                 appGui.addMsg("Received end game");
             }
+
+            else if(cmd == Demineur.DIFF){
+                int diffIndex = inputStream.readInt();
+                remainingSquares = inputStream.readInt();
+                changeDifficultyFromListener(diffIndex);
+            }
         }
 
         catch(IOException e){
@@ -243,6 +261,32 @@ public class Demineur extends JFrame implements Runnable {
         }
 
     }
+
+    private void changeDifficultyFromListener(int diffIndex){
+        switch(diffIndex){
+            case 0:
+            difficulty = Level.EASY;
+                break;
+                
+            case 1:
+            difficulty = Level.MEDIUM;
+                break;
+
+            case 2:
+            difficulty = Level.HARD;
+                break;
+
+            case 3:
+            difficulty = Level.IMPOSSIBLE;
+                break;
+
+            case 4:
+            difficulty = Level.CUSTOM;
+                break;
+        }
+        reset();
+    }
+    
 
     protected void sendPos(int x, int y){
         try{
@@ -297,6 +341,10 @@ public class Demineur extends JFrame implements Runnable {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public boolean isNetPlay() {
+        return netPlay;
     }
 
 }

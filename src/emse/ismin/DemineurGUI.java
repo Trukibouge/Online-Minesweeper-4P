@@ -220,11 +220,20 @@ public class DemineurGUI extends JPanel implements ActionListener {
         app.WriteScore();
     }
 	
-	private void newGame(Level difficulty) {
-		demineurPanel.removeAll();
-        app.newDifficulty(difficulty);
-		generateMinefieldDisplay();
-		app.pack();
+	protected void newGame(Level difficulty) {
+        if(!app.isNetPlay()){
+            demineurPanel.removeAll();
+            app.newDifficulty(difficulty);
+            generateMinefieldDisplay();
+            app.pack();
+        }
+
+        else{
+            demineurPanel.removeAll();
+            generateMinefieldDisplay();
+            app.pack();
+        }
+
 	}
 
 	@Override
