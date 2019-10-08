@@ -34,6 +34,7 @@ public class Demineur extends JFrame implements Runnable {
     public static int PLAYERNB = 4;
     public static int DEATH = 5;
     public static int DIFF = 6;
+    public static int SCOREUPDATE = 7;
 
     private Socket socket;
     private DataOutputStream outputStream;
@@ -120,6 +121,7 @@ public class Demineur extends JFrame implements Runnable {
             lost = false;
             score = 0;
             appGui.updateRemainingMinesLabel();
+            appGui.updateScoreLabel();
             appGui.newGame(difficulty);
         }
 	}
@@ -217,6 +219,7 @@ public class Demineur extends JFrame implements Runnable {
 
             else if(cmd == Demineur.START){
                 appGui.addMsg("Gogogo");
+                reset();
                 started = true;
                 appGui.getCompteur().startTimer();
             }
@@ -246,13 +249,20 @@ public class Demineur extends JFrame implements Runnable {
             }
 
             else if(cmd == Demineur.END){
-                appGui.addMsg("Received end game");
+                System.out.println("Received end game");
             }
 
             else if(cmd == Demineur.DIFF){
                 int diffIndex = inputStream.readInt();
                 remainingSquares = inputStream.readInt();
                 changeDifficultyFromListener(diffIndex);
+            }
+
+            else if(cmd == Demineur.SCOREUPDATE){
+                score = inputStream.readInt();
+                System.out.println("Received score: " + score);
+                appGui.updateScoreLabel();
+                
             }
         }
 

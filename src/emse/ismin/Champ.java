@@ -260,5 +260,9 @@ public class Champ {
         return updated;
     }
 
+    public int getCellScore(int x, int y){
+        return Integer.parseInt(getCloseMines(x,y))*10;
+    }
+
 }
 

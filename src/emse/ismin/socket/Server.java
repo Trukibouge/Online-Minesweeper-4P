@@ -32,7 +32,7 @@ public class Server extends JFrame implements Runnable {
     private static final long serialVersionUID = -5822900338130207614L;
     private ServerGUI gui;
     private int playerCount;
-    private List<String> playerList;
+    private Map<String, Integer> playerScore = new HashMap<String, Integer>();
     private Map<String, DataInputStream> inputStreamMap = new HashMap<String, DataInputStream>();
     private Map<String, DataOutputStream> outputStreamMap = new HashMap<String, DataOutputStream>();
     private ServerSocket socketManager;
@@ -79,6 +79,7 @@ public class Server extends JFrame implements Runnable {
 
             inputStreamMap.put(playerNick, input);
             outputStreamMap.put(playerNick, output);
+            playerScore.put(playerNick, 0);
 
             sendMsgToAll(playerNick + " has joined the game!");
             sendMsgToAll("Current number of players: " + Integer.toString(playerCount));
@@ -142,6 +143,7 @@ public class Server extends JFrame implements Runnable {
                         boolean updated = champ.updateClickState(x,y,nb);
                         if(updated){
                             sendPosition(x, y, nb);
+                            sendScore(playerNick, x, y);
                             remainingSquares--;
                             if(remainingSquares == 0){
                                 sendEnd();
@@ -174,6 +176,17 @@ public class Server extends JFrame implements Runnable {
         listener.start();
     }
 
+    private void sendScore(String playerNick, int x, int y){
+        playerScore.put(playerNick, playerScore.get(playerNick) + champ.getCellScore(x, y));
+        try{
+            outputStreamMap.get(playerNick).writeInt(Demineur.SCOREUPDATE);
+            outputStreamMap.get(playerNick).writeInt(playerScore.get(playerNick));
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
     protected void changeDiff(int newDiffIndex){
         switch(newDiffIndex){
             case 0:
@@ -197,11 +210,26 @@ public class Server extends JFrame implements Runnable {
                 break;
         }
 
-        champ = new Champ(serverDifficulty);
-        champ.newGame();
-        remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty);
+        startNewGame();
+        resetMineNumber();
+        resetScore();
         sendDiff(newDiffIndex);
 
+    }
+
+    private void resetScore(){
+        for(Map.Entry<String, Integer> entry : playerScore.entrySet()){
+            entry.setValue(0);
+        }
+    }
+
+    private void startNewGame(){
+        champ = new Champ(serverDifficulty);
+        champ.newGame();
+    }
+
+    private void resetMineNumber(){
+        remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty);
     }
 
     private void sendDiff(int newDiffIndex){
@@ -221,6 +249,16 @@ public class Server extends JFrame implements Runnable {
     }
 
     private void sendEnd(){
+        String endString = "";
+        if(deathCount == playerCount){
+            endString += "Vous êtes NULS techniquement tactiquement \n";
+        }
+        for(Map.Entry<String, Integer> entry : playerScore.entrySet()){
+            String nick = entry.getKey();
+            Integer score = entry.getValue();
+            endString += nick + ": " + score + "\n";
+        }
+
         try{
             gui.addMsg("Sending end to all");
             System.out.println("Sending end to all");
