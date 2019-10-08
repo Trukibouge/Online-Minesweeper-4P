@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -158,6 +159,10 @@ public class Case extends JPanel implements MouseListener {
             case 4:
                 cellColor = new Color(255, 235, 59);
                 break;
+        }
+        if(player>4){
+            Random rdmColor = new Random();
+            cellColor = new Color(rdmColor.nextInt(256), rdmColor.nextInt(256), rdmColor.nextInt(256));
         }
     }
 	
