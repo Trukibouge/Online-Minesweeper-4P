@@ -173,42 +173,46 @@ public class Case extends JPanel implements MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-        if(app.isConnected()){
-            if(app.isStarted()){
-                if(!app.isLost()){
-                    app.sendPos(x, y);
+        if(app.isNetPlay()){
+            if(app.isConnected()){
+                if(app.isStarted()){
+                    if(!app.isLost()){
+                        app.sendPos(x, y);
+                    }
+                }
+                else{
+                    app.getAppGui().showPopUpMessage("The game has not started!!!! >:(");
                 }
             }
+
             else{
-                app.getAppGui().showPopUpMessage("The game has not started!!!! >:(");
+                app.getAppGui().showPopUpMessage("Please connect to a server.");
             }
         }
 
         else{
-            app.getAppGui().showPopUpMessage("Please connect to a server.");
+            clicked = true;
+                repaint();
 
-        // clicked = true;
-        // repaint();
+                if(!app.isStarted()){
+                    app.setStarted(true);
+                    app.getAppGui().getCompteur().startTimer();
+                }
 
-        // if(!app.isStarted()){
-        //      app.setStarted(true);
-        //      app.getAppGui().getCompteur().startTimer();
-        // }
-
-        // if(!app.isLost() || !app.isWon()){
-        //     if(app.getChamp().isMine(x,y)){
-        //         app.getAppGui().onDeath();
-        //     }
-        //     else{
-        //         updateLabels(x,y);
-        //         if(app.getRemainingSquares() == 0){
-        //             app.getAppGui().onWin();
-        //         }
-        //     }
-        // }
-
-        // repaint()
+                if(!app.isLost() || !app.isWon()){
+                    if(app.getChamp().isMine(x,y)){
+                        app.getAppGui().onDeath();
+                    }
+                    else{
+                        updateLabels(x,y);
+                        if(app.getRemainingSquares() == 0){
+                            app.getAppGui().onWin();
+                        }
+                    }
+                }
+                repaint();
         }
+        
         
 	}
 

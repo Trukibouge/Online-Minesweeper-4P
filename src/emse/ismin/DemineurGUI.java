@@ -64,9 +64,12 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		this.setLayout(new BorderLayout());
         
         initializeMinefieldDisplay();
+        initializeGUI();
+	
+    }
 
-        //Game
-		menuBar.add(menuGame);
+    private void initializeGUI(){
+        menuBar.add(menuGame);
 		
 		menuEasy.addActionListener(this);
 		menuMedium.addActionListener(this);
@@ -124,7 +127,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         lowerButtonPanelLower.add(lowerButtonPanelLowerLower, BorderLayout.SOUTH);
 
         lowerButtonPanel.add(lowerButtonPanelUpper, BorderLayout.NORTH);
-        lowerButtonPanel.add(lowerButtonPanelLower, BorderLayout.SOUTH);
+
         
         JPanel upperPanel = new JPanel();
         upperPanel.setLayout(new BorderLayout());
@@ -148,7 +151,12 @@ public class DemineurGUI extends JPanel implements ActionListener {
         upperPanelLower.add(connectButton);
 
         upperPanel.add(upperPanelUpper, BorderLayout.NORTH);
-        upperPanel.add(upperPanelLower, BorderLayout.SOUTH);
+
+        if(app.isNetPlay()){
+            lowerButtonPanel.add(lowerButtonPanelLower, BorderLayout.SOUTH);
+            upperPanel.add(upperPanelLower, BorderLayout.SOUTH);
+        }
+
 
 		add(upperPanel, BorderLayout.NORTH);
 		add(demineurPanel, BorderLayout.CENTER);
@@ -239,22 +247,27 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == menuEasy) {
+            app.setNetPlay(false);
 			newGame(Level.EASY);
 		}
 		
 		if(e.getSource() == menuMedium){
+            app.setNetPlay(false);
 			newGame(Level.MEDIUM);
 		}
 		
 		if(e.getSource() == menuHard){
+            app.setNetPlay(false);
 			newGame(Level.HARD);
 		}
 		
 		if(e.getSource() == menuImpossible){
+            app.setNetPlay(false);
 			newGame(Level.IMPOSSIBLE);
 		}
 		
 		if(e.getSource() == menuCustom){
+            app.setNetPlay(false);
 			newGame(Level.CUSTOM);
 		}
 		

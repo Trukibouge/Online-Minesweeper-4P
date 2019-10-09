@@ -57,7 +57,7 @@ public class Demineur extends JFrame implements Runnable {
     private int playerNb;
 
     private boolean connected = false;
-    private boolean netPlay = true;
+    private boolean netPlay = false;
     
     public void setStarted (boolean started){
         this.started = started;
@@ -357,6 +357,10 @@ public class Demineur extends JFrame implements Runnable {
 
     public boolean isNetPlay() {
         return netPlay;
+    }
+
+    public void setNetPlay(boolean netPlay) {
+        this.netPlay = netPlay;
     }
 
 }
