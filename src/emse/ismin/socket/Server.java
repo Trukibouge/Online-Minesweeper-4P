@@ -142,9 +142,9 @@ public class Server extends JFrame implements Runnable {
                         System.out.println("Got message from player nb." + nb + ": " + x + "/" + y);
                         boolean updated = champ.updateClickState(x,y,nb);
                         if(updated){
+                            remainingSquares--;
                             sendPosition(x, y, nb);
                             sendScore(playerNick, x, y);
-                            remainingSquares--;
                             if(remainingSquares == 0){
                                 sendEnd();
                             }
@@ -177,7 +177,9 @@ public class Server extends JFrame implements Runnable {
     }
 
     private void sendScore(String playerNick, int x, int y){
-        playerScore.put(playerNick, playerScore.get(playerNick) + champ.getCellScore(x, y));
+        if(!champ.isMine(x, y)){
+            playerScore.put(playerNick, playerScore.get(playerNick) + champ.getCellScore(x, y));
+        }   
         try{
             outputStreamMap.get(playerNick).writeInt(Demineur.SCOREUPDATE);
             outputStreamMap.get(playerNick).writeInt(playerScore.get(playerNick));
@@ -209,12 +211,9 @@ public class Server extends JFrame implements Runnable {
             serverDifficulty = Level.CUSTOM;
                 break;
         }
-
         startNewGame();
         resetMineNumber();
-        resetScore();
         sendDiff(newDiffIndex);
-
     }
 
     private void resetScore(){
@@ -312,8 +311,12 @@ public class Server extends JFrame implements Runnable {
         try{
             gui.addMsg("Sending start to all");
             System.out.println("Sending start to all");
+            resetMineNumber();
+            resetScore();
+            champ.resetClickState();
             for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
                 entry.getValue().writeInt(Demineur.START);
+                entry.getValue().writeInt(remainingSquares);
             }
         }
 

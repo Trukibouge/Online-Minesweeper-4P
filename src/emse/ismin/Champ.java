@@ -260,6 +260,14 @@ public class Champ {
         return updated;
     }
 
+    public void resetClickState(){
+        for(int i = 0; i < playerClickState.length; i++){
+            for(int j = 0; j < playerClickState[0].length; j++){
+                playerClickState[i][j] = 0;
+            }
+        }
+    }
+
     public int getCellScore(int x, int y){
         return Integer.parseInt(getCloseMines(x,y))*10;
     }

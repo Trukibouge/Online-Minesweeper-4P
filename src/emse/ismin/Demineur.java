@@ -218,6 +218,7 @@ public class Demineur extends JFrame implements Runnable {
             }
 
             else if(cmd == Demineur.START){
+                remainingSquares = inputStream.readInt();
                 appGui.addMsg("Gogogo");
                 reset();
                 started = true;
@@ -255,6 +256,7 @@ public class Demineur extends JFrame implements Runnable {
             else if(cmd == Demineur.DIFF){
                 int diffIndex = inputStream.readInt();
                 remainingSquares = inputStream.readInt();
+                appGui.updateRemainingMinesLabel();
                 changeDifficultyFromListener(diffIndex);
             }
 
