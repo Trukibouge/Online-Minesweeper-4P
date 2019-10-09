@@ -177,7 +177,11 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		for(int i = 0; i < currentDim; i++) {
 			for(int j = 0; j < currentDim; j++) {
 				demineurPanelCases[i][j] = new Case(app, i, j);	
-				demineurPanel.add(demineurPanelCases[i][j]);
+                demineurPanel.add(demineurPanelCases[i][j]);
+                
+                if(!app.isNetPlay()){
+                    demineurPanelCases[i][j].setCaseContent(app.getChamp().getCloseMines(i, j));
+                }
 			}
 		}
 	}

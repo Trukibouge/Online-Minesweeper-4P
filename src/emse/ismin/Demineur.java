@@ -75,8 +75,12 @@ public class Demineur extends JFrame implements Runnable {
 	 * Create mine field
 	 */
 	public Demineur() {
-		super("Demineur");
-		//champ.newGame();
+        super("Demineur");
+        
+        if(netPlay == false){
+            champ.newGame();
+        }
+
 		appGui = new DemineurGUI(this);
 		setContentPane(appGui);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
