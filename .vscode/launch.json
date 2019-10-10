@@ -8,6 +8,13 @@
             "type": "java",
             "name": "CodeLens (Launch) - Server",
             "request": "launch",
+            "mainClass": "emse.ismin.Server",
+            "projectName": "Demineur"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Server",
+            "request": "launch",
             "mainClass": "emse.ismin.socket.Server",
             "projectName": "Demineur"
         },

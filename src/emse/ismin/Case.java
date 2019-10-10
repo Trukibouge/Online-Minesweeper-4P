@@ -47,7 +47,7 @@ public class Case extends JPanel implements MouseListener {
 	}
 	
 	public void resetCase() {
-		caseContent = "?";
+		//caseContent = "?";
 		clicked = false;
 		god = false;
 		repaint();
@@ -56,58 +56,49 @@ public class Case extends JPanel implements MouseListener {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);		
-	
+
 		if(!god) {
+            //cell not clicked
 			if(!clicked) {
-				g.setColor(new Color(158, 158, 158));
-				g.fillRect(1, 1, getWidth(), getHeight());
-			}
+                paintMaterialGrey(g);
+            }
             
+            //cell clicked
 			else {
-                // if(!app.isLost()){
-                if(1==1){
-                    if(mine) {
-						try {
-							BufferedImage image;
-							image = ImageIO.read(new File("img/death.png"));
-							g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
-						}
-						catch(IOException ex){
-							ex.printStackTrace();
-						}	
-					}
-						
-					else {
-                        g.setColor(cellColor);
-                        g.fillRect(1, 1, getWidth(), getHeight());
-                        g.setColor(whiteColor);
-                        g.drawString(caseContent,getWidth()/2,getHeight()/2);
-					}
-                }
-                			
+                paintCell(g);
 			}
-		}
+        }
         
-        //god mode
+        //god mode (reveal)
 		else {
-            if(app.getChamp().isMine(x,y)) {
-                try {
-                    BufferedImage image;
-                    image = ImageIO.read(new File("img/death.png"));
-                    g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
-                }
-                catch(IOException ex){
-                    ex.printStackTrace();
-                }	
-            }
-                
-            else {
-                g.setColor(new Color (0,0,0,100));
-                g.drawString(caseContent,getWidth()/2,getHeight()/2);
-                g.fillRect(1, 1, getWidth(), getHeight());
-            }
+            paintCell(g);
 		}
-	}
+    }
+
+    private void paintMaterialGrey(Graphics g){
+        g.setColor(new Color(158, 158, 158));
+        g.fillRect(1, 1, getWidth(), getHeight());
+    }
+    
+    private void paintCell(Graphics g){
+        if(mine) {
+            try {
+                BufferedImage image;
+                image = ImageIO.read(new File("img/death.png"));
+                g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
+            }
+            catch(IOException ex){
+                ex.printStackTrace();
+            }	
+        }
+            
+        else {
+            g.setColor(cellColor);
+            g.fillRect(1, 1, getWidth(), getHeight());
+            g.setColor(whiteColor);
+            g.drawString(caseContent,getWidth()/2,getHeight()/2);
+        }
+    }
     
     // private void spread(){
     //     int xsup = x ==  minefieldState.length - 1 ? minefieldState.length - 1 : x + 1;
@@ -122,20 +113,13 @@ public class Case extends JPanel implements MouseListener {
 	// 			if( !(i==x && j==y) && minefieldState[i][j]) {
 	// 				closeMinesCount++;
 	// 			}
-	// 		}
-	// 	}
     // }
-
-
     
 	public void godMode() {
 		god = true;
 		repaint();
 	}
-		
-	
 
-    
     public void cellClicked(){
         clicked = true;
         setCellColor();
@@ -174,47 +158,52 @@ public class Case extends JPanel implements MouseListener {
 	@Override
 	public void mousePressed(MouseEvent e) {
         if(app.isNetPlay()){
-            if(app.isConnected()){
-                if(app.isStarted()){
-                    if(!app.isLost()){
-                        app.sendPos(x, y);
-                    }
-                }
-                else{
-                    app.getAppGui().showPopUpMessage("The game has not started!!!! >:(");
+            mouseClickedOnline();
+        }
+
+        else{
+            mouseClickedOffline();
+        }
+    }
+
+    private void mouseClickedOnline(){
+        if(app.isConnected()){
+            if(app.isStarted()){
+                if(!app.isLost()){
+                    app.sendPos(x, y);
                 }
             }
-
             else{
-                app.getAppGui().showPopUpMessage("Please connect to a server.");
+                app.getAppGui().showPopUpMessage("The game has not started!!!! >:(");
             }
         }
 
         else{
+            app.getAppGui().showPopUpMessage("Please connect to a server.");
+        }
+    }
+    
+    private void mouseClickedOffline(){
+        if(!app.isLost()){
             clicked = true;
-                repaint();
-
                 if(!app.isStarted()){
-                    app.setStarted(true);
-                    app.getAppGui().getCompteur().startTimer();
+                    app.startGameAndTimer();
                 }
-
-                if(!app.isLost() || !app.isWon()){
+    
+                if(!app.isWon()){
                     if(app.getChamp().isMine(x,y)){
                         app.getAppGui().onDeath();
                     }
                     else{
-                        updateLabels(x,y);
+                        processClickedCell(x,y);
                         if(app.getRemainingSquares() == 0){
                             app.getAppGui().onWin();
                         }
                     }
                 }
                 repaint();
-        }
-        
-        
-	}
+        }        
+    }
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
@@ -251,13 +240,12 @@ public class Case extends JPanel implements MouseListener {
         this.player = player;
     }
 	
-    private void updateLabels(int x, int y) {
+    private void processClickedCell(int x, int y) {
 		if(!app.getChamp().getScoreCalculatedPositions()[x][y]) {
 			app.getChamp().getScoreCalculatedPositions()[x][y] = true;
             app.setScore(app.getScore() + Integer.parseInt(app.getChamp().getCloseMines(x,y))*10);
             app.setRemainingSquares(app.getRemainingSquares() - 1);
-            app.getAppGui().updateScoreLabel();
-            app.getAppGui().updateRemainingMinesLabel();
+            app.getAppGui().updateLabels();
 		}
     }
 

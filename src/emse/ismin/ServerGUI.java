@@ -1,4 +1,4 @@
-package emse.ismin.socket;
+package emse.ismin;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
