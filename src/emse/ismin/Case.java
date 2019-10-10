@@ -166,7 +166,7 @@ public class Case extends JPanel implements MouseListener {
 
         else{
             mouseClickedOffline();
-            spreadOffline();
+            
         }
     }
 
@@ -207,6 +207,7 @@ public class Case extends JPanel implements MouseListener {
                     }
                 }
                 repaint();
+                spreadOffline();
         }        
     }
 

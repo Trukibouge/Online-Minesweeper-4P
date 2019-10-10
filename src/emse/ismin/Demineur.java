@@ -57,7 +57,7 @@ public class Demineur extends JFrame implements Runnable {
     private int playerNb;
 
     private boolean connected = false;
-    private boolean netPlay = true;
+    private boolean netPlay = false;
     
     public void setStarted (boolean started){
         this.started = started;
@@ -116,6 +116,7 @@ public class Demineur extends JFrame implements Runnable {
             champ.newGame();
             started = false;
             lost = false;
+            won = false;
             score = 0;
             remainingSquares = champ.GetDim(difficulty)*champ.GetDim(difficulty) - champ.getInitialMineNumber(difficulty);
         }
