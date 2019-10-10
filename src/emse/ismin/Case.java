@@ -100,7 +100,7 @@ public class Case extends JPanel implements MouseListener {
         }
     }
     
-    private void spread(){
+    private void spreadOffline(){
         if(Integer.parseInt(app.getChamp().getCloseMines(x, y)) == 0){
 
             int xsup = x ==  app.getChamp().getMinefieldState().length - 1 ? app.getChamp().getMinefieldState().length - 1 : x + 1;
@@ -111,7 +111,7 @@ public class Case extends JPanel implements MouseListener {
             for(int i = xinf; i <= xsup; i++) {
                 for(int j = yinf; j <= ysup; j++) {
                     if( !(i==x && j==y) && (Integer.parseInt(app.getChamp().getCloseMines(i,j)) == 0) && (!app.getAppGui().getDemineurPanelCases()[i][j].clicked) ){
-                        app.getAppGui().getDemineurPanelCases()[i][j].mouseClickedOffline();
+                            app.getAppGui().getDemineurPanelCases()[i][j].mouseClickedOffline();
                     }
                 }
             }
@@ -162,10 +162,12 @@ public class Case extends JPanel implements MouseListener {
 	public void mousePressed(MouseEvent e) {
         if(app.isNetPlay()){
             mouseClickedOnline();
+            spreadOffline();
         }
 
         else{
             mouseClickedOffline();
+            spreadOffline();
         }
     }
 
@@ -205,7 +207,6 @@ public class Case extends JPanel implements MouseListener {
                     }
                 }
                 repaint();
-                spread();
         }        
     }
 
