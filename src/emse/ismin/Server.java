@@ -1,4 +1,4 @@
-package emse.ismin.socket;
+package emse.ismin;
 
 import java.net.*;
 import java.util.HashMap;

@@ -64,9 +64,12 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		this.setLayout(new BorderLayout());
         
         initializeMinefieldDisplay();
+        initializeGUI();
+	
+    }
 
-        //Game
-		menuBar.add(menuGame);
+    private void initializeGUI(){
+        menuBar.add(menuGame);
 		
 		menuEasy.addActionListener(this);
 		menuMedium.addActionListener(this);
@@ -124,7 +127,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         lowerButtonPanelLower.add(lowerButtonPanelLowerLower, BorderLayout.SOUTH);
 
         lowerButtonPanel.add(lowerButtonPanelUpper, BorderLayout.NORTH);
-        lowerButtonPanel.add(lowerButtonPanelLower, BorderLayout.SOUTH);
+
         
         JPanel upperPanel = new JPanel();
         upperPanel.setLayout(new BorderLayout());
@@ -148,7 +151,12 @@ public class DemineurGUI extends JPanel implements ActionListener {
         upperPanelLower.add(connectButton);
 
         upperPanel.add(upperPanelUpper, BorderLayout.NORTH);
-        upperPanel.add(upperPanelLower, BorderLayout.SOUTH);
+
+        if(app.isNetPlay()){
+            lowerButtonPanel.add(lowerButtonPanelLower, BorderLayout.SOUTH);
+            upperPanel.add(upperPanelLower, BorderLayout.SOUTH);
+        }
+
 
 		add(upperPanel, BorderLayout.NORTH);
 		add(demineurPanel, BorderLayout.CENTER);
@@ -169,7 +177,12 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		for(int i = 0; i < currentDim; i++) {
 			for(int j = 0; j < currentDim; j++) {
 				demineurPanelCases[i][j] = new Case(app, i, j);	
-				demineurPanel.add(demineurPanelCases[i][j]);
+                demineurPanel.add(demineurPanelCases[i][j]);
+                
+                if(!app.isNetPlay()){
+                    demineurPanelCases[i][j].setCaseContent(app.getChamp().getCloseMines(i, j));
+                    demineurPanelCases[i][j].setMine(app.getChamp().isMine(i,j));
+                }
 			}
 		}
 	}
@@ -177,11 +190,18 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	private void resetMinefieldDisplay() {
 		for(int i = 0; i < demineurPanelCases.length; i++) {
 			for(int j = 0; j < demineurPanelCases[0].length; j++) {
+                demineurPanelCases[i][j].setCaseContent(app.getChamp().getCloseMines(i, j));
+                demineurPanelCases[i][j].setMine(app.getChamp().isMine(i,j));
 				demineurPanelCases[i][j].resetCase();
 			}
 		}
 	}
-	
+    
+    protected void updateLabels(){
+        updateScoreLabel();
+        updateRemainingMinesLabel();
+    }
+    
 	protected void updateScoreLabel() {
 		scoreLabel.setText("Score: " + app.getScore());
     }
@@ -202,8 +222,8 @@ public class DemineurGUI extends JPanel implements ActionListener {
         compteur.stopTimer();
         final ImageIcon deathIcon = new ImageIcon("img/death.png");
         JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
-        //updatePanelGodMode();
-        //app.setLost(true);
+        updatePanelGodMode();
+        app.setLost(true);
         //app.WriteScore();
     }
 
@@ -225,6 +245,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
             demineurPanel.removeAll();
             app.newDifficulty(difficulty);
             generateMinefieldDisplay();
+            updateLabels();
             app.pack();
         }
 
@@ -239,22 +260,27 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == menuEasy) {
+            app.setNetPlay(false);
 			newGame(Level.EASY);
 		}
 		
 		if(e.getSource() == menuMedium){
+            app.setNetPlay(false);
 			newGame(Level.MEDIUM);
 		}
 		
 		if(e.getSource() == menuHard){
+            app.setNetPlay(false);
 			newGame(Level.HARD);
 		}
 		
 		if(e.getSource() == menuImpossible){
+            app.setNetPlay(false);
 			newGame(Level.IMPOSSIBLE);
 		}
 		
 		if(e.getSource() == menuCustom){
+            app.setNetPlay(false);
 			newGame(Level.CUSTOM);
 		}
 		

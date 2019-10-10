@@ -57,7 +57,7 @@ public class Demineur extends JFrame implements Runnable {
     private int playerNb;
 
     private boolean connected = false;
-    private boolean netPlay = true;
+    private boolean netPlay = false;
     
     public void setStarted (boolean started){
         this.started = started;
@@ -75,8 +75,12 @@ public class Demineur extends JFrame implements Runnable {
 	 * Create mine field
 	 */
 	public Demineur() {
-		super("Demineur");
-		//champ.newGame();
+        super("Demineur");
+        
+        if(netPlay == false){
+            champ.newGame();
+        }
+
 		appGui = new DemineurGUI(this);
 		setContentPane(appGui);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -221,8 +225,7 @@ public class Demineur extends JFrame implements Runnable {
                 remainingSquares = inputStream.readInt();
                 appGui.addMsg("Gogogo");
                 reset();
-                started = true;
-                appGui.getCompteur().startTimer();
+                startGameAndTimer();
             }
 
             else if(cmd == Demineur.PLAYERNB){
@@ -241,7 +244,7 @@ public class Demineur extends JFrame implements Runnable {
                 appGui.getDemineurPanelCases()[x][y].setMine(isMine);
                 appGui.getDemineurPanelCases()[x][y].setCaseContent(value);
                 appGui.getDemineurPanelCases()[x][y].setPlayer(playerNb);
-                appGui.getDemineurPanelCases()[x][y].cellClicked();
+                appGui.getDemineurPanelCases()[x][y].cellPositionReceivedFromServer();
                 if(isMine && playerNb == this.playerNb){
                     lost = true;
                     sendDeath();
@@ -272,6 +275,11 @@ public class Demineur extends JFrame implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    protected void startGameAndTimer(){
+        started = true;
+        appGui.getCompteur().startTimer();
     }
 
     private void changeDifficultyFromListener(int diffIndex){
@@ -357,6 +365,10 @@ public class Demineur extends JFrame implements Runnable {
 
     public boolean isNetPlay() {
         return netPlay;
+    }
+
+    public void setNetPlay(boolean netPlay) {
+        this.netPlay = netPlay;
     }
 
 }
