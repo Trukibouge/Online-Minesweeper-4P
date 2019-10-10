@@ -244,7 +244,7 @@ public class Demineur extends JFrame implements Runnable {
                 appGui.getDemineurPanelCases()[x][y].setMine(isMine);
                 appGui.getDemineurPanelCases()[x][y].setCaseContent(value);
                 appGui.getDemineurPanelCases()[x][y].setPlayer(playerNb);
-                appGui.getDemineurPanelCases()[x][y].cellClicked();
+                appGui.getDemineurPanelCases()[x][y].cellPositionReceivedFromServer();
                 if(isMine && playerNb == this.playerNb){
                     lost = true;
                     sendDeath();
