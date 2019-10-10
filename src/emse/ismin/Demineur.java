@@ -57,7 +57,7 @@ public class Demineur extends JFrame implements Runnable {
     private int playerNb;
 
     private boolean connected = false;
-    private boolean netPlay = false;
+    private boolean netPlay = true;
     
     public void setStarted (boolean started){
         this.started = started;
@@ -122,6 +122,7 @@ public class Demineur extends JFrame implements Runnable {
         
         else{
             started = false;
+            won = false;
             lost = false;
             score = 0;
             appGui.updateRemainingMinesLabel();
@@ -254,6 +255,9 @@ public class Demineur extends JFrame implements Runnable {
 
             else if(cmd == Demineur.END){
                 System.out.println("Received end game");
+                String endString = inputStream.readUTF();
+                boolean goodEnding = inputStream.readBoolean();
+                appGui.onWin(endString, goodEnding);
             }
 
             else if(cmd == Demineur.DIFF){

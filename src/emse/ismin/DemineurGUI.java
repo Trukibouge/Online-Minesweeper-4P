@@ -126,7 +126,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         sendButton.addActionListener(this);
         lowerButtonPanelLower.add(lowerButtonPanelLowerLower, BorderLayout.SOUTH);
 
-        lowerButtonPanel.add(lowerButtonPanelUpper, BorderLayout.NORTH);
+
 
         
         JPanel upperPanel = new JPanel();
@@ -157,6 +157,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
             upperPanel.add(upperPanelLower, BorderLayout.SOUTH);
         }
 
+        else{
+            lowerButtonPanel.add(lowerButtonPanelUpper, BorderLayout.NORTH);
+        }
 
 		add(upperPanel, BorderLayout.NORTH);
 		add(demineurPanel, BorderLayout.CENTER);
@@ -222,8 +225,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
         compteur.stopTimer();
         final ImageIcon deathIcon = new ImageIcon("img/death.png");
         JOptionPane.showMessageDialog(null, "YOU ARE DEAD ☠\n Score: " + String.valueOf(app.getScore()), "Dead", JOptionPane.INFORMATION_MESSAGE, deathIcon);
-        updatePanelGodMode();
         app.setLost(true);
+        if(!app.isNetPlay()){
+            updatePanelGodMode();
+        }
         //app.WriteScore();
     }
 
@@ -231,13 +236,21 @@ public class DemineurGUI extends JPanel implements ActionListener {
         JOptionPane.showMessageDialog(null, msg);
     }
 
-    protected void onWin(){
+    protected void onWin(String msg, boolean goodEnding){
         compteur.stopTimer();
-        final ImageIcon winIcon = new ImageIcon("img/win.jpg");
-        JOptionPane.showMessageDialog(null, "YOU WIN\nScore: " + String.valueOf(app.getScore()) + "\nTime: " + String.valueOf(compteur.getTime()), "Win", JOptionPane.INFORMATION_MESSAGE, winIcon);
-        updatePanelGodMode();
+        final ImageIcon winIcon;
+        if(goodEnding){
+            winIcon = new ImageIcon("img/win.jpg");
+        }
+        else{
+            winIcon = new ImageIcon("img/death.png");
+        }
+        JOptionPane.showMessageDialog(null, msg, "End", JOptionPane.INFORMATION_MESSAGE, winIcon);
         app.setWon(true);
-        app.WriteScore();
+        if(!app.isNetPlay()){
+            updatePanelGodMode();
+        }
+        //app.WriteScore();
     }
 	
 	protected void newGame(Level difficulty) {

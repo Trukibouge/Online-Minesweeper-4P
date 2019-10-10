@@ -162,7 +162,6 @@ public class Case extends JPanel implements MouseListener {
 	public void mousePressed(MouseEvent e) {
         if(app.isNetPlay()){
             mouseClickedOnline();
-            spreadOffline();
         }
 
         else{
@@ -174,7 +173,7 @@ public class Case extends JPanel implements MouseListener {
     private void mouseClickedOnline(){
         if(app.isConnected()){
             if(app.isStarted()){
-                if(!app.isLost()){
+                if(!app.isLost() && !app.isWon()){
                     app.sendPos(x, y);
                 }
             }
@@ -202,7 +201,8 @@ public class Case extends JPanel implements MouseListener {
                     else{
                         processClickedCell(x,y);
                         if(app.getRemainingSquares() == 0){
-                            app.getAppGui().onWin();
+                            String endString = "YOU WIN\nScore: " + String.valueOf(app.getScore()) + "\nTime: " + String.valueOf(app.getAppGui().getCompteur().getTime());
+                            app.getAppGui().onWin(endString, true);
                         }
                     }
                 }

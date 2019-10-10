@@ -176,6 +176,8 @@ public class Server extends JFrame implements Runnable {
         listener.start();
     }
 
+
+
     private void sendScore(String playerNick, int x, int y){
         if(!champ.isMine(x, y)){
             playerScore.put(playerNick, playerScore.get(playerNick) + champ.getCellScore(x, y));
@@ -248,9 +250,12 @@ public class Server extends JFrame implements Runnable {
     }
 
     private void sendEnd(){
-        String endString = "";
+        String endString = "End of the game. \n";
+        boolean goodEnding = true;
         if(deathCount == playerCount){
             endString += "Vous êtes NULS techniquement tactiquement \n";
+            goodEnding = false;
+            
         }
         for(Map.Entry<String, Integer> entry : playerScore.entrySet()){
             String nick = entry.getKey();
@@ -263,6 +268,8 @@ public class Server extends JFrame implements Runnable {
             System.out.println("Sending end to all");
             for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
                 entry.getValue().writeInt(Demineur.END);
+                entry.getValue().writeUTF(endString);
+                entry.getValue().writeBoolean(goodEnding);
             }
         }
 
@@ -291,6 +298,23 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    private void spreadOnline(int x, int y, int playerNb){
+        if(Integer.parseInt(champ.getCloseMines(x, y)) == 0){
+            int xsup = x ==  champ.getMinefieldState().length - 1 ? champ.getMinefieldState().length - 1 : x + 1;
+            int xinf = x == 0 ? 0 : x - 1;
+            int ysup = y == champ.getMinefieldState()[0].length - 1 ? champ.getMinefieldState()[0].length - 1 : y + 1;
+            int yinf = y == 0 ? 0 : y - 1;
+            
+            for(int i = xinf; i <= xsup; i++) {
+                for(int j = yinf; j <= ysup; j++) {
+                    if( !(i==x && j==y) && (Integer.parseInt(champ.getCloseMines(i,j)) == 0)){
+                            
+                    }
+                }
+            }
+        }
+    }
+
     private void sendMsgToAll(String msg){
         try{
             gui.addMsg("Sending message to all: " + msg);
@@ -311,6 +335,7 @@ public class Server extends JFrame implements Runnable {
         try{
             gui.addMsg("Sending start to all");
             System.out.println("Sending start to all");
+            champ.displayDebug();
             resetMineNumber();
             resetScore();
             champ.resetClickState();
