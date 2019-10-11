@@ -36,6 +36,7 @@ public class Server extends JFrame implements Runnable {
     private static final long serialVersionUID = -5822900338130207614L;
     private ServerGUI gui;
     private int playerCount;
+    private int givenColorCount;
     private Map<String, Integer> playerScore = new HashMap<String, Integer>();
     private Map<String, DataInputStream> inputStreamMap = new HashMap<String, DataInputStream>();
     private Map<String, DataOutputStream> outputStreamMap = new HashMap<String, DataOutputStream>();
@@ -80,6 +81,7 @@ public class Server extends JFrame implements Runnable {
             playerNick = input.readUTF() ;
             gui.addMsg(playerNick + " connected");
             playerCount++;
+            givenColorCount++;
 
 
             inputStreamMap.put(playerNick, input);
@@ -89,9 +91,9 @@ public class Server extends JFrame implements Runnable {
             sendMsgToAll(playerNick + " has joined the game!");
             sendMsgToAll("Current number of players: " + Integer.toString(playerCount));
 
-            gui.addMsg("Attributing player nb to: " + playerNick + " = " + playerCount);
+            gui.addMsg("Attributing player nb to: " + playerNick + " = " + givenColorCount);
             output.writeInt(Demineur.PLAYERNB);
-            output.writeInt(playerCount);
+            output.writeInt(givenColorCount);
 
             heartbeat(playerNick);
 
@@ -146,8 +148,10 @@ public class Server extends JFrame implements Runnable {
             outputStreamMap.get(playerNick).writeUTF("Heyman");
         }
         catch(IOException e){
-            System.out.println(playerNick + " has disconnected :(");
-            gui.addMsg(playerNick + " has disconnected :(");
+            String msg = playerNick + " has disconnected :(";
+            System.out.println(msg);
+            gui.addMsg(msg);
+            sendMsgToAll(msg);
             removePlayer(playerNick);
             System.out.println("Removed " + playerNick);
         }
