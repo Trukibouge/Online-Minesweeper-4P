@@ -6,22 +6,26 @@ import java.util.List;
 import java.util.Map;
 import java.io.*;
 import javax.swing.JFrame;
+import javax.swing.Timer;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import emse.ismin.Demineur;
 import emse.ismin.Level;
 import emse.ismin.Champ;
 
-//Collection 1
+                //Collection 1 ok
 //Bonus 5
 //Deconnexion (bonus)
 //IHM (bonus)
-//Score (bonus)
-//Chat (bonus)
-//Couleurs 2
-//Solo 4
-//Niveau Solo 2
+                //Score (bonus) ok
+                //Chat (bonus) ok
+                //Couleurs 2 ok
+                //Solo 4 ok
+                //Niveau Solo 2 ok
 //Fichier 1
-//Réseau: nombre de clients infini 1, position 2, fin de partie 1, affichage couleur 2   
+                //Réseau: nombre de clients infini 1, position 2, fin de partie 1, affichage couleur 2 ok
 //Commentaires 1 Javadoc 1 
 
 public class Server extends JFrame implements Runnable {
@@ -32,9 +36,11 @@ public class Server extends JFrame implements Runnable {
     private static final long serialVersionUID = -5822900338130207614L;
     private ServerGUI gui;
     private int playerCount;
+    private int givenColorCount;
     private Map<String, Integer> playerScore = new HashMap<String, Integer>();
     private Map<String, DataInputStream> inputStreamMap = new HashMap<String, DataInputStream>();
     private Map<String, DataOutputStream> outputStreamMap = new HashMap<String, DataOutputStream>();
+    private Map<String, Timer> timerMap = new HashMap<String, Timer>();
     private ServerSocket socketManager;
     private Level serverDifficulty = Level.MEDIUM;
     private Champ champ = new Champ(serverDifficulty);
@@ -75,6 +81,7 @@ public class Server extends JFrame implements Runnable {
             playerNick = input.readUTF() ;
             gui.addMsg(playerNick + " connected");
             playerCount++;
+            givenColorCount++;
 
 
             inputStreamMap.put(playerNick, input);
@@ -84,9 +91,11 @@ public class Server extends JFrame implements Runnable {
             sendMsgToAll(playerNick + " has joined the game!");
             sendMsgToAll("Current number of players: " + Integer.toString(playerCount));
 
-            gui.addMsg("Attributing player nb to: " + playerNick + " = " + playerCount);
+            gui.addMsg("Attributing player nb to: " + playerNick + " = " + givenColorCount);
             output.writeInt(Demineur.PLAYERNB);
-            output.writeInt(playerCount);
+            output.writeInt(givenColorCount);
+
+            heartbeat(playerNick);
 
             int diffIndex = 1;
             switch(serverDifficulty){
@@ -121,7 +130,41 @@ public class Server extends JFrame implements Runnable {
 
     }
 
+    private void heartbeat(String playerNick){
+        int delay = 5000;
+        ActionListener heartbeatTask = new ActionListener(){
+            public void actionPerformed(ActionEvent evt){
+                checkConnection(playerNick);
+            }
+        };
+        Timer heartbeatTimer = new Timer(delay, heartbeatTask);
+        timerMap.put(playerNick, heartbeatTimer);
+        heartbeatTimer.start();
+    }
 
+    private void checkConnection(String playerNick){
+        try{
+            System.out.println("Sent heartbeat to " + playerNick);
+            outputStreamMap.get(playerNick).writeUTF("Heyman");
+        }
+        catch(IOException e){
+            String msg = playerNick + " has disconnected :(";
+            System.out.println(msg);
+            gui.addMsg(msg);
+            sendMsgToAll(msg);
+            removePlayer(playerNick);
+            System.out.println("Removed " + playerNick);
+        }
+    }
+
+    private void removePlayer(String playerNick){
+        playerCount--;
+        inputStreamMap.remove(playerNick);
+        outputStreamMap.remove(playerNick);
+        playerScore.remove(playerNick);
+        timerMap.get(playerNick).stop();
+        timerMap.remove(playerNick);
+    }
 
     public void listen(String playerNick){
         Thread listener = new Thread(new Runnable(){

@@ -57,7 +57,7 @@ public class Demineur extends JFrame implements Runnable {
     private int playerNb;
 
     private boolean connected = false;
-    private boolean netPlay = false;
+    private boolean netPlay = true;
     
     public void setStarted (boolean started){
         this.started = started;
