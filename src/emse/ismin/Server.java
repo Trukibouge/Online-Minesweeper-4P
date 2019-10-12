@@ -17,7 +17,7 @@ import emse.ismin.Champ;
 
                 //Collection 1 ok
 //Bonus 5
-//Deconnexion (bonus)
+                //Deconnexion (bonus) ok
 //IHM (bonus)
                 //Score (bonus) ok
                 //Chat (bonus) ok
@@ -183,15 +183,8 @@ public class Server extends JFrame implements Runnable {
                         int y = inputStreamMap.get(playerNick).readInt();
                         int nb = inputStreamMap.get(playerNick).readInt();
                         System.out.println("Got message from player nb." + nb + ": " + x + "/" + y);
-                        boolean updated = champ.updateClickState(x,y,nb);
-                        if(updated){
-                            remainingSquares--;
-                            sendPosition(x, y, nb);
-                            sendScore(playerNick, x, y);
-                            if(remainingSquares == 0){
-                                sendEnd();
-                            }
-                        }
+                        positionClicked(x, y, nb, playerNick);
+                        
                     }
 
                     else if(cmd == Demineur.DEATH){
@@ -321,27 +314,39 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
-    private void sendPosition(int x, int y, int playerNb){
-        try{
-            gui.addMsg("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
-            System.out.println("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
-            for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
-                entry.getValue().writeInt(Demineur.POS);
-                entry.getValue().writeInt(x);
-                entry.getValue().writeInt(y);
-                entry.getValue().writeInt(playerNb);
-                entry.getValue().writeUTF(champ.getCloseMines(x, y));
-                entry.getValue().writeBoolean(champ.isMine(x, y));
-                entry.getValue().writeInt(remainingSquares);
+    private void positionClicked(int x, int y, int playerNb, String playerNick){
+        boolean updated = champ.updateClickState(x,y,playerNb);
+        if(updated){
+            remainingSquares--;
+            
+            try{
+                gui.addMsg("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
+                System.out.println("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
+                for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
+                    entry.getValue().writeInt(Demineur.POS);
+                    entry.getValue().writeInt(x);
+                    entry.getValue().writeInt(y);
+                    entry.getValue().writeInt(playerNb);
+                    entry.getValue().writeUTF(champ.getCloseMines(x, y));
+                    entry.getValue().writeBoolean(champ.isMine(x, y));
+                    entry.getValue().writeInt(remainingSquares);
+                }
+            }
+    
+            catch(IOException e){
+                e.printStackTrace();
+            }
+
+            sendScore(playerNick, x, y);
+
+            if(remainingSquares == 0){
+                sendEnd();
             }
         }
 
-        catch(IOException e){
-            e.printStackTrace();
-        }
     }
 
-    private void spreadOnline(int x, int y, int playerNb){
+    private void spreadOnline(int x, int y, int playerNb, String playerNick){
         if(Integer.parseInt(champ.getCloseMines(x, y)) == 0){
             int xsup = x ==  champ.getMinefieldState().length - 1 ? champ.getMinefieldState().length - 1 : x + 1;
             int xinf = x == 0 ? 0 : x - 1;
@@ -351,7 +356,7 @@ public class Server extends JFrame implements Runnable {
             for(int i = xinf; i <= xsup; i++) {
                 for(int j = yinf; j <= ysup; j++) {
                     if( !(i==x && j==y) && (Integer.parseInt(champ.getCloseMines(i,j)) == 0)){
-                            
+                            positionClicked(i, j, playerNb, playerNick);
                     }
                 }
             }
@@ -374,6 +379,10 @@ public class Server extends JFrame implements Runnable {
 
     }
 
+    private void resetDeathCount(){
+        deathCount = 0;
+    }
+
     public void sendStart(){
         try{
             gui.addMsg("Sending start to all");
@@ -381,6 +390,7 @@ public class Server extends JFrame implements Runnable {
             champ.displayDebug();
             resetMineNumber();
             resetScore();
+            resetDeathCount();
             champ.resetClickState();
             for(Map.Entry<String, DataOutputStream> entry : outputStreamMap.entrySet()){
                 entry.getValue().writeInt(Demineur.START);
