@@ -184,7 +184,6 @@ public class Server extends JFrame implements Runnable {
                         int nb = inputStreamMap.get(playerNick).readInt();
                         System.out.println("Got message from player nb." + nb + ": " + x + "/" + y);
                         positionClicked(x, y, nb, playerNick);
-                        
                     }
 
                     else if(cmd == Demineur.DEATH){
@@ -318,7 +317,6 @@ public class Server extends JFrame implements Runnable {
         boolean updated = champ.updateClickState(x,y,playerNb);
         if(updated){
             remainingSquares--;
-            
             try{
                 gui.addMsg("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
                 System.out.println("Sending position to all: " + ": " + x + "/" + y + "(" + playerNb + ")" +"; isMine = " + champ.isMine(x,y));
@@ -342,6 +340,7 @@ public class Server extends JFrame implements Runnable {
             if(remainingSquares == 0){
                 sendEnd();
             }
+            spreadOnline(x, y, playerNb, playerNick);
         }
 
     }
@@ -355,7 +354,7 @@ public class Server extends JFrame implements Runnable {
             
             for(int i = xinf; i <= xsup; i++) {
                 for(int j = yinf; j <= ysup; j++) {
-                    if( !(i==x && j==y) && (Integer.parseInt(champ.getCloseMines(i,j)) == 0)){
+                    if( !(i==x && j==y) && (champ.getPlayerClickState()[i][j] == 0)){
                             positionClicked(i, j, playerNb, playerNick);
                     }
                 }
