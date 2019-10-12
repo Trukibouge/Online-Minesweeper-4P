@@ -110,7 +110,7 @@ public class Case extends JPanel implements MouseListener {
             
             for(int i = xinf; i <= xsup; i++) {
                 for(int j = yinf; j <= ysup; j++) {
-                    if( !(i==x && j==y) && (Integer.parseInt(app.getChamp().getCloseMines(i,j)) == 0) && (!app.getAppGui().getDemineurPanelCases()[i][j].clicked) ){
+                    if( !(i==x && j==y) && (!app.getAppGui().getDemineurPanelCases()[i][j].clicked) ){
                             app.getAppGui().getDemineurPanelCases()[i][j].mouseClickedOffline();
                     }
                 }

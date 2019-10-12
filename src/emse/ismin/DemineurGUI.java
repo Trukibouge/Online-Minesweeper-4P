@@ -126,9 +126,6 @@ public class DemineurGUI extends JPanel implements ActionListener {
         sendButton.addActionListener(this);
         lowerButtonPanelLower.add(lowerButtonPanelLowerLower, BorderLayout.SOUTH);
 
-
-
-        
         JPanel upperPanel = new JPanel();
         upperPanel.setLayout(new BorderLayout());
 
