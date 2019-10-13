@@ -98,7 +98,16 @@ public class Case extends JPanel implements MouseListener {
      * @param g
      */
     private void paintMaterialGrey(Graphics g){
-        g.setColor(new Color(158, 158, 158));
+        if((x+y)%2 == 1){
+            g.setColor(new Color(178, 178, 178));
+        }
+        else{
+            g.setColor(new Color(158, 158, 158));
+        }
+
+
+
+
         g.fillRect(1, 1, getWidth(), getHeight());
     }
 

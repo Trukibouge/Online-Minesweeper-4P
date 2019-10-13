@@ -32,7 +32,7 @@ import emse.ismin.Champ;
                 //Couleurs 2 ok
                 //Solo 4 ok
                 //Niveau Solo 2 ok
-//Fichier 1
+                //Fichier 1
                 //Réseau: nombre de clients infini 1, position 2, fin de partie 1, affichage couleur 2 ok
                 //Commentaires 1 Javadoc 1
 
@@ -179,8 +179,9 @@ public class Server extends JFrame implements Runnable {
             String msg = playerNick + " has disconnected :(";
             System.out.println(msg);
             gui.addMsg(msg);
-            sendMsgToAll(msg);
             removePlayer(playerNick);
+            sendMsgToAll(msg);
+            sendMsgToAll("Current number of player: " + playerCount);
             System.out.println("Removed " + playerNick);
         }
     }
@@ -474,7 +475,7 @@ public class Server extends JFrame implements Runnable {
             
             for(int i = xinf; i <= xsup; i++) {
                 for(int j = yinf; j <= ysup; j++) {
-                    if( !(i==x && j==y) && (champ.getPlayerClickState()[i][j] == 0)){
+                    if( !(i==x && j==y) && (champ.getPlayerClickState()[i][j] == 0) && !champ.getMinefieldState()[x][y]){
                             positionClicked(i, j, playerNb, playerNick);
                     }
                 }
