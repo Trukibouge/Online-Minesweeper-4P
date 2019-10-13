@@ -12,11 +12,12 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+/**
+ * @author Truki
+ * Case class. Used to display cells on the minefield.
+ */
 public class Case extends JPanel implements MouseListener {
-	
-	/**
-     *
-     */
+
     private static final long serialVersionUID = 6544968331371366303L;
     private String caseContent = "?";
 	private final static int CASESIZE = 50;
@@ -26,12 +27,18 @@ public class Case extends JPanel implements MouseListener {
 	private int y;
 	
 	private boolean clicked = false;
-    private boolean god = false;
-    private boolean mine = false;
-    private int player = 0;
+    private boolean god = false; //god mode (instantly display a cell)
+    private boolean mine = false; //true if the cell contains a mine
+    private int player = 0; //id of the player who clicked a cell
     private Color cellColor;
     private Color whiteColor = new Color(255,255,255);
-	
+
+    /**
+     * Constructor
+     * @param app
+     * @param x
+     * @param y
+     */
 	public Case(Demineur app, int x, int y) {
 		this.app = app;
 		this.x = x;
@@ -41,11 +48,18 @@ public class Case extends JPanel implements MouseListener {
 		setPreferredSize(new Dimension(CASESIZE,CASESIZE));
 		addMouseListener(this);
 	}
-	
+
+    /**
+     * Set the content of a cell
+     * @param text
+     */
 	public void setText(String text) {
 		this.caseContent = text;
 	}
-	
+
+    /**
+     * Reset a cell state
+     */
 	public void resetCase() {
 		//caseContent = "?";
 		clicked = false;
@@ -53,6 +67,10 @@ public class Case extends JPanel implements MouseListener {
 		repaint();
 	}
 
+    /**
+     * paintComponent override
+     * @param g
+     */
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);		
@@ -75,11 +93,19 @@ public class Case extends JPanel implements MouseListener {
 		}
     }
 
+    /**
+     * Paint a cell in grey
+     * @param g
+     */
     private void paintMaterialGrey(Graphics g){
         g.setColor(new Color(158, 158, 158));
         g.fillRect(1, 1, getWidth(), getHeight());
     }
-    
+
+    /**
+     * Paint a cell
+     * @param g
+     */
     private void paintCell(Graphics g){
         if(mine) {
             try {
@@ -99,7 +125,11 @@ public class Case extends JPanel implements MouseListener {
             g.drawString(caseContent,getWidth()/2,getHeight()/2);
         }
     }
-    
+
+
+    /**
+     * Spread clicked cells in offline mode
+     */
     private void spreadOffline(){
         if(Integer.parseInt(app.getChamp().getCloseMines(x, y)) == 0){
 
@@ -117,18 +147,27 @@ public class Case extends JPanel implements MouseListener {
             }
         }
     }
-    
+
+    /**
+     * Set god mode for a cell
+     */
 	public void godMode() {
 		god = true;
 		repaint();
 	}
 
+    /**
+     * Process a cell position in netplay
+     */
     protected void cellPositionReceivedFromServer(){
         clicked = true;
         setCellColor();
         repaint();
     }
 
+    /**
+     * Set the cell color for netplay
+     */
     public void setCellColor(){
         switch(player){
             case 0: //solo case
@@ -170,6 +209,9 @@ public class Case extends JPanel implements MouseListener {
         }
     }
 
+    /**
+     * Process the click on a cell for netplay
+     */
     private void mouseClickedOnline(){
         if(app.isConnected()){
             if(app.isStarted()){
@@ -186,7 +228,10 @@ public class Case extends JPanel implements MouseListener {
             app.getAppGui().showPopUpMessage("Please connect to a server.");
         }
     }
-    
+
+    /**
+     * Process the click on a cell in offline mode
+     */
     private void mouseClickedOffline(){
         if(!app.isLost()){
             clicked = true;
@@ -226,10 +271,18 @@ public class Case extends JPanel implements MouseListener {
 		
 	}
 
+    /**
+     * Get the string content of a cell
+     * @return Content
+     */
     public String getCaseContent() {
         return caseContent;
     }
 
+    /**
+     * Set the string content of a cell
+     * @param caseContent Content
+     */
     public void setCaseContent(String caseContent) {
         this.caseContent = caseContent;
     }
@@ -245,7 +298,12 @@ public class Case extends JPanel implements MouseListener {
     public void setPlayer(int player) {
         this.player = player;
     }
-	
+
+    /**
+     * Process score and labels for a clicked cell (offline mode only)
+     * @param x
+     * @param y
+     */
     private void processClickedCell(int x, int y) {
 		if(!app.getChamp().getScoreCalculatedPositions()[x][y]) {
 			app.getChamp().getScoreCalculatedPositions()[x][y] = true;

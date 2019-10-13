@@ -17,13 +17,12 @@ import javax.swing.JFrame;
 
 /**
  * @author Truki
- * @version 0.1, 2019/9/3
+ * @version 0.2, 2019/10/13
+ * Demineur object. A great game also called minesweeper. The object also serves as a client.
  */
 public class Demineur extends JFrame implements Runnable {
-    
-    /**
-     *
-     */
+
+    //Constants
     private static final long serialVersionUID = 3899778202618430188L;
     public static int PORT = 10000;
     public static String HOSTNAME = "localhost";
@@ -35,29 +34,32 @@ public class Demineur extends JFrame implements Runnable {
     public static int DEATH = 5;
     public static int DIFF = 6;
     public static int SCOREUPDATE = 7;
+    private static String FILENAME = "scores.dat";
 
+    //Online components
     private Socket socket;
     private DataOutputStream outputStream;
     private DataInputStream inputStream;
     private Thread process;
 
-
+    //Offline components
 	private Level difficulty = Level.MEDIUM;
 	private int score = 0;
 	private Champ champ = new Champ(difficulty);
     private DemineurGUI appGui;
-    private int remainingSquares = champ.GetDim(difficulty)*champ.GetDim(difficulty) - champ.getInitialMineNumber(difficulty);
-    
+    private int remainingSquares = champ.GetDim(difficulty)*champ.GetDim(difficulty) - champ.getInitialMineNumber(difficulty); //number of remaining cells to be disclosed
+
+    //Shared information
     private boolean started = false;
     private boolean lost = false;
     private boolean won = false;
 
-    private static String FILENAME = "scores.dat";
 
-    private int playerNb;
 
-    private boolean connected = false;
-    private boolean netPlay = true;
+    private int playerNb; //id of the player
+
+    private boolean connected = false; //connection to the server is made
+    private boolean netPlay = true; //offline or online mode
     
     public void setStarted (boolean started){
         this.started = started;
@@ -72,7 +74,7 @@ public class Demineur extends JFrame implements Runnable {
 	}
 
 	/**
-	 * Create mine field
+	 * Constructor
 	 */
 	public Demineur() {
         super("Demineur");
@@ -87,22 +89,24 @@ public class Demineur extends JFrame implements Runnable {
 		pack();
 		setVisible(true);
 	}
-	
 
-	
+
+    /**
+     * Quit the app
+     */
 	public void quit() {
 		System.out.println("Exiting app...");
 		System.exit(0);
 	}
-	
+
 	public Champ getChamp() {
 		return (champ);
 	}
-	
+
 	public Level getLevel() {
 		return(difficulty);
 	}
-	
+
 	public int getScore() {
 		return score;
 	}
@@ -111,6 +115,9 @@ public class Demineur extends JFrame implements Runnable {
 		this.score = score;
 	}
 
+    /**
+     * Reset Demineur status (new game, change in difficulty, etc.)
+     */
 	public void reset() {
         if(netPlay == false){
             champ.newGame();
@@ -131,7 +138,11 @@ public class Demineur extends JFrame implements Runnable {
             appGui.newGame(difficulty);
         }
 	}
-	
+
+    /**
+     * Change difficulty and create a new champ
+     * @param difficulty
+     */
 	public void newDifficulty(Level difficulty) {
         this.difficulty = difficulty;
         this.champ = new Champ(difficulty);
@@ -162,6 +173,9 @@ public class Demineur extends JFrame implements Runnable {
         this.won = won;
     }
 
+    /**
+     * Write score in a savefile
+     */
     public void WriteScore(){
         try{
             Path path = Paths.get(FILENAME);
@@ -187,7 +201,12 @@ public class Demineur extends JFrame implements Runnable {
         }
     }
 
-
+    /**
+     * Connect to a server
+     * @param hostName
+     * @param port
+     * @param nickName Player nick
+     */
     protected void connect(String hostName, int port, String nickName){
         System.out.println("Connecting to " + hostName + ":" + port + " as " + nickName);
 
@@ -215,14 +234,20 @@ public class Demineur extends JFrame implements Runnable {
         process.start();
     }
 
+    /**
+     * Listen to the server
+     */
     private void listen(){
         try{
             int cmd = inputStream.readInt();
             System.out.println(cmd);
+
+            //Message received
             if(cmd == Demineur.MSG){
                 appGui.addMsg(inputStream.readUTF());
             }
 
+            //Start game command received
             else if(cmd == Demineur.START){
                 remainingSquares = inputStream.readInt();
                 appGui.addMsg("Gogogo");
@@ -230,11 +255,13 @@ public class Demineur extends JFrame implements Runnable {
                 startGameAndTimer();
             }
 
+            //Player id number received
             else if(cmd == Demineur.PLAYERNB){
                 playerNb = inputStream.readInt();
                 appGui.addMsg("Your number: " + playerNb);
             }
 
+            //Position of a cell to be disclosed received
             else if(cmd == Demineur.POS){
                 int x = inputStream.readInt();
                 int y = inputStream.readInt();
@@ -247,6 +274,8 @@ public class Demineur extends JFrame implements Runnable {
                 appGui.getDemineurPanelCases()[x][y].setCaseContent(value);
                 appGui.getDemineurPanelCases()[x][y].setPlayer(playerNb);
                 appGui.getDemineurPanelCases()[x][y].cellPositionReceivedFromServer();
+
+                //Lose condition
                 if(isMine && playerNb == this.playerNb){
                     lost = true;
                     sendDeath();
@@ -254,6 +283,7 @@ public class Demineur extends JFrame implements Runnable {
                 }
             }
 
+            //End of game received
             else if(cmd == Demineur.END){
                 System.out.println("Received end game");
                 String endString = inputStream.readUTF();
@@ -261,6 +291,7 @@ public class Demineur extends JFrame implements Runnable {
                 appGui.onWin(endString, goodEnding);
             }
 
+            //Difficulty change received
             else if(cmd == Demineur.DIFF){
                 int diffIndex = inputStream.readInt();
                 remainingSquares = inputStream.readInt();
@@ -268,6 +299,7 @@ public class Demineur extends JFrame implements Runnable {
                 changeDifficultyFromListener(diffIndex);
             }
 
+            //Score update received
             else if(cmd == Demineur.SCOREUPDATE){
                 score = inputStream.readInt();
                 System.out.println("Received score: " + score);
@@ -282,11 +314,18 @@ public class Demineur extends JFrame implements Runnable {
 
     }
 
+    /**
+     * Start game and timer
+     */
     protected void startGameAndTimer(){
         started = true;
         appGui.getCompteur().startTimer();
     }
 
+    /**
+     * Change difficulty (online)
+     * @param diffIndex
+     */
     private void changeDifficultyFromListener(int diffIndex){
         switch(diffIndex){
             case 0:
@@ -311,8 +350,12 @@ public class Demineur extends JFrame implements Runnable {
         }
         reset();
     }
-    
 
+    /**
+     * Send click position to the server
+     * @param x
+     * @param y
+     */
     protected void sendPos(int x, int y){
         try{
             System.out.println("Sending position to server: " + x + "/" + y);
@@ -347,6 +390,9 @@ public class Demineur extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Run listening thread
+     */
     public void run(){
         while(process != null){
             System.out.println("Starting to listen man");
@@ -357,7 +403,7 @@ public class Demineur extends JFrame implements Runnable {
        
 
     /**
-	 * 
+	 * Create Demineur object
 	 * @param args
 	 */
 	public static void main(String[] args) {

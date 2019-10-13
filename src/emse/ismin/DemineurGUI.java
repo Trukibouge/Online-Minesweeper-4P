@@ -10,7 +10,7 @@ import javax.swing.*;
 /**
  * 
  * @author Truki
- *
+ * GUI of the Demineur class
  */
 public class DemineurGUI extends JPanel implements ActionListener {
 
@@ -48,15 +48,19 @@ public class DemineurGUI extends JPanel implements ActionListener {
     private JTextField portTextField = new JTextField(String.valueOf(Demineur.PORT), 5);
     private JTextField nickTextField = new JTextField("Nickname", 10);
     private JButton connectButton = new JButton("Connect");
-    
+
     private JTextArea msgArea = new JTextArea(5,50);
+    private JScrollPane msgScrollPane = new JScrollPane(msgArea);
 
     private JTextField chatBox = new JTextField(">", 50);
     private JButton sendButton = new JButton("Send");
 
     private Compteur compteur;
 
-	
+    /**
+     * Constructor
+     * @param app
+     */
 	public DemineurGUI(Demineur app) {
 		//ImageIcon quitIcon = new ImageIcon("sortieCLR.gif");
 		this.app = app;
@@ -68,6 +72,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	
     }
 
+    /**
+     * Initialize GUI Component display
+     */
     private void initializeGUI(){
         menuBar.add(menuGame);
 		
@@ -119,7 +126,8 @@ public class DemineurGUI extends JPanel implements ActionListener {
         lowerButtonPanelUpper.add(quitButton);
         lowerButtonPanelLower.setLayout(new BorderLayout());
 
-        lowerButtonPanelLower.add(msgArea, BorderLayout.NORTH);
+        //lowerButtonPanelLower.add(msgArea, BorderLayout.NORTH);
+        lowerButtonPanelLower.add(msgScrollPane, BorderLayout.NORTH);
         JPanel lowerButtonPanelLowerLower = new JPanel();
         lowerButtonPanelLowerLower.add(chatBox);
         lowerButtonPanelLowerLower.add(sendButton);
@@ -164,12 +172,18 @@ public class DemineurGUI extends JPanel implements ActionListener {
 
 		
     }
-    
+
+    /**
+     * Initialize minefield GUI
+     */
     private void initializeMinefieldDisplay(){
         demineurPanel = new JPanel();
         generateMinefieldDisplay();
     }
-	
+
+    /**
+     * Display a minefield display
+     */
 	private void generateMinefieldDisplay() {
 		int currentDim = app.getChamp().GetDim(app.getLevel());
 		demineurPanelCases = new Case[currentDim][currentDim];
@@ -186,7 +200,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
 			}
 		}
 	}
-	
+
+    /**
+     * Reset the display of a minefield
+     */
 	private void resetMinefieldDisplay() {
 		for(int i = 0; i < demineurPanelCases.length; i++) {
 			for(int j = 0; j < demineurPanelCases[0].length; j++) {
@@ -196,20 +213,32 @@ public class DemineurGUI extends JPanel implements ActionListener {
 			}
 		}
 	}
-    
+
+    /**
+     * Update score and remaining cells label
+     */
     protected void updateLabels(){
         updateScoreLabel();
         updateRemainingMinesLabel();
     }
-    
-	protected void updateScoreLabel() {
+
+    /**
+     * Update score
+     */
+    protected void updateScoreLabel() {
 		scoreLabel.setText("Score: " + app.getScore());
     }
-    
+
+    /**
+     * Update remaining cells to click
+     */
     protected void updateRemainingMinesLabel(){
         remainingMinesLabel.setText("Remaining squares: " + app.getRemainingSquares());
     }
-	
+
+    /**
+     * Display all the minefield's content instantly
+     */
 	private void updatePanelGodMode() {
 		for(int i = 0; i < demineurPanelCases.length; i++) {
 			for(int j = 0; j < demineurPanelCases[0].length; j++) {
@@ -218,6 +247,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		}
 	}
 
+    /**
+     * Display death message
+     */
 	protected void onDeath() {
         compteur.stopTimer();
         final ImageIcon deathIcon = new ImageIcon("img/death.png");
@@ -229,10 +261,19 @@ public class DemineurGUI extends JPanel implements ActionListener {
         //app.WriteScore();
     }
 
+    /**
+     * Display a popup message
+     * @param msg Message to be displayed
+     */
     protected void showPopUpMessage(String msg){
         JOptionPane.showMessageDialog(null, msg);
     }
 
+    /**
+     * Show game ending message
+     * @param msg
+     * @param goodEnding //if the end is a happy end
+     */
     protected void onWin(String msg, boolean goodEnding){
         compteur.stopTimer();
         final ImageIcon winIcon;
@@ -249,7 +290,11 @@ public class DemineurGUI extends JPanel implements ActionListener {
         }
         //app.WriteScore();
     }
-	
+
+    /**
+     * Start a new game of a set difficulty: reset panels and labels accordingly
+     * @param difficulty
+     */
 	protected void newGame(Level difficulty) {
         if(!app.isNetPlay()){
             demineurPanel.removeAll();
@@ -323,6 +368,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		
 	}
 
+    /**
+     * Reset labels and panesls
+     */
     private void guiReset(){
         app.reset();
         resetMinefieldDisplay();
@@ -335,6 +383,10 @@ public class DemineurGUI extends JPanel implements ActionListener {
         return compteur;
     }
 
+    /**
+     * Add a message to the messaging area
+     * @param str Message
+     */
     protected void addMsg(String str){
         msgArea.append(str + "\n");
     }

@@ -26,28 +26,35 @@ import emse.ismin.Champ;
                 //Niveau Solo 2 ok
 //Fichier 1
                 //Réseau: nombre de clients infini 1, position 2, fin de partie 1, affichage couleur 2 ok
-//Commentaires 1 Javadoc 1 
+                //Commentaires 1 Javadoc 1
 
+
+/**
+ * @author Truki
+ * Server of Demineur.
+ */
 public class Server extends JFrame implements Runnable {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = -5822900338130207614L;
     private ServerGUI gui;
     private int playerCount;
     private int givenColorCount;
+
     private Map<String, Integer> playerScore = new HashMap<String, Integer>();
     private Map<String, DataInputStream> inputStreamMap = new HashMap<String, DataInputStream>();
     private Map<String, DataOutputStream> outputStreamMap = new HashMap<String, DataOutputStream>();
     private Map<String, Timer> timerMap = new HashMap<String, Timer>();
+
     private ServerSocket socketManager;
     private Level serverDifficulty = Level.MEDIUM;
     private Champ champ = new Champ(serverDifficulty);
-    private int remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty);
+    private int remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty); //number of cell that are not mines
 
-    private int deathCount = 0;
+    private int deathCount = 0; //number of dead player
 
+    /**
+     * Constructor
+     */
     public Server(){
         System.out.println("Starting server");
         champ.newGame();
@@ -60,6 +67,9 @@ public class Server extends JFrame implements Runnable {
         startServer();
     }
 
+    /**
+     * Start server and initialize a server socket
+     */
     protected void startServer(){
         gui.addMsg("Waiting for clients...\n");     
         try {
@@ -72,6 +82,10 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Create a new socket on a connection, initialize a player's instance
+     * @param socketManager Server socket to be used by the server
+     */
     private void createNewSocket(ServerSocket socketManager){
         try {
             Socket socket = socketManager.accept(); //new client
@@ -130,6 +144,10 @@ public class Server extends JFrame implements Runnable {
 
     }
 
+    /**
+     * Check if a player is connected periodically
+     * @param playerNick
+     */
     private void heartbeat(String playerNick){
         int delay = 5000;
         ActionListener heartbeatTask = new ActionListener(){
@@ -157,6 +175,10 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Remove a player in case of disconnection
+     * @param playerNick
+     */
     private void removePlayer(String playerNick){
         playerCount--;
         inputStreamMap.remove(playerNick);
@@ -166,18 +188,25 @@ public class Server extends JFrame implements Runnable {
         timerMap.remove(playerNick);
     }
 
+    /**
+     * Listen to a socket
+     * @param playerNick player nick associated to a socket
+     */
     public void listen(String playerNick){
         Thread listener = new Thread(new Runnable(){
             public void run(){
                 try{
                     int cmd = inputStreamMap.get(playerNick).readInt();
                     System.out.println(cmd);
+
+                    //Message received
                     if(cmd == Demineur.MSG){
                         String inMsg = inputStreamMap.get(playerNick).readUTF();
                         System.out.println("Got msg from " + playerNick + ": " + inMsg);
                         sendMsgToAll(playerNick + ": " + inMsg);
                     }
 
+                    //Position received
                     else if(cmd == Demineur.POS){
                         int x = inputStreamMap.get(playerNick).readInt();
                         int y = inputStreamMap.get(playerNick).readInt();
@@ -186,6 +215,7 @@ public class Server extends JFrame implements Runnable {
                         positionClicked(x, y, nb, playerNick);
                     }
 
+                    //Player death received
                     else if(cmd == Demineur.DEATH){
                         System.out.println("Sending death");
                         gui.addMsg(playerNick + " is dead. Il est NUL techniquement tactiquement.");
@@ -208,11 +238,17 @@ public class Server extends JFrame implements Runnable {
                 }
             }
         });
+
+        //Start listening thread again
         listener.start();
     }
 
-
-
+    /**
+     * Send current score to a player
+     * @param playerNick
+     * @param x
+     * @param y
+     */
     private void sendScore(String playerNick, int x, int y){
         if(!champ.isMine(x, y)){
             playerScore.put(playerNick, playerScore.get(playerNick) + champ.getCellScore(x, y));
@@ -226,6 +262,11 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+
+    /**
+     * Change game difficulty
+     * @param newDiffIndex
+     */
     protected void changeDiff(int newDiffIndex){
         switch(newDiffIndex){
             case 0:
@@ -253,21 +294,34 @@ public class Server extends JFrame implements Runnable {
         sendDiff(newDiffIndex);
     }
 
+    /**
+     * Reset score for all players
+     */
     private void resetScore(){
         for(Map.Entry<String, Integer> entry : playerScore.entrySet()){
             entry.setValue(0);
         }
     }
 
+    /**
+     * Start new game
+     */
     private void startNewGame(){
         champ = new Champ(serverDifficulty);
         champ.newGame();
     }
 
+    /**
+     * Reset the number of remaining cells to be clicked on
+     */
     private void resetMineNumber(){
         remainingSquares = champ.GetDim(serverDifficulty)*champ.GetDim(serverDifficulty) - champ.getInitialMineNumber(serverDifficulty);
     }
 
+    /**
+     * Send difficulty change to all players
+     * @param newDiffIndex
+     */
     private void sendDiff(int newDiffIndex){
         try{
             gui.addMsg("Changing difficulty to " + newDiffIndex + ", number of mines: " + remainingSquares);
@@ -284,6 +338,9 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Send end of game flag to all players. Determine good or bad ending.
+     */
     private void sendEnd(){
         String endString = "End of the game. \n";
         boolean goodEnding = true;
@@ -313,6 +370,13 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Process a cell clicked command from a client
+     * @param x
+     * @param y
+     * @param playerNb
+     * @param playerNick
+     */
     private void positionClicked(int x, int y, int playerNb, String playerNick){
         boolean updated = champ.updateClickState(x,y,playerNb);
         if(updated){
@@ -345,6 +409,13 @@ public class Server extends JFrame implements Runnable {
 
     }
 
+    /**
+     * Spread the clicked cell if the adjacent number of mines is 0
+     * @param x
+     * @param y
+     * @param playerNb
+     * @param playerNick
+     */
     private void spreadOnline(int x, int y, int playerNb, String playerNick){
         if(Integer.parseInt(champ.getCloseMines(x, y)) == 0){
             int xsup = x ==  champ.getMinefieldState().length - 1 ? champ.getMinefieldState().length - 1 : x + 1;
@@ -362,6 +433,10 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Send message to all players
+     * @param msg
+     */
     private void sendMsgToAll(String msg){
         try{
             gui.addMsg("Sending message to all: " + msg);
@@ -378,10 +453,16 @@ public class Server extends JFrame implements Runnable {
 
     }
 
+    /**
+     * Reset the number of death player
+     */
     private void resetDeathCount(){
         deathCount = 0;
     }
 
+    /**
+     * Send a start of the game flag to all players
+     */
     public void sendStart(){
         try{
             gui.addMsg("Sending start to all");
@@ -402,13 +483,16 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Run server listening thread
+     */
     public void run(){
         createNewSocket(socketManager);
         new Thread(this).start(); //start waiting for new client
     }
 
     /**
-     * 
+     * Instantiate a server object
      * @param args
      */
     public static void main(String[] args) {

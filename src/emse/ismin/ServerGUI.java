@@ -10,11 +10,11 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * GUI of the Demineur server.
+ */
 public class ServerGUI extends JPanel implements ActionListener{
     
-    /**
-     *
-     */
     private static final long serialVersionUID = -399773621255213729L;
 
     private Server server;
