@@ -1,6 +1,7 @@
 package emse.ismin;
 
 import java.net.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,13 @@ import javax.swing.Timer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import emse.ismin.Demineur;
 import emse.ismin.Level;
@@ -36,6 +44,8 @@ import emse.ismin.Champ;
 public class Server extends JFrame implements Runnable {
 
     private static final long serialVersionUID = -5822900338130207614L;
+    private static String SERVERFILEDATA = "serverHighScore.dat";
+
     private ServerGUI gui;
     private int playerCount;
     private int givenColorCount;
@@ -303,6 +313,43 @@ public class Server extends JFrame implements Runnable {
         }
     }
 
+    private Map.Entry<String, Integer> getHighestScore(){
+       Map.Entry<String, Integer> maxEntry = null;
+        for (Map.Entry<String, Integer> entry : playerScore.entrySet())
+        {
+            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+            {
+                maxEntry = entry;
+            }
+        }
+        return maxEntry;
+    }
+
+    private void writeServerHighScore(boolean success){
+        String succ;
+        
+        if(success){
+            succ = "CLEARED";
+        }
+        else{
+            succ = "FAILED";
+        }
+
+        try{
+            Path path = Paths.get(SERVERFILEDATA);
+            if(!Files.exists(path)){
+                Files.write(path, Arrays.asList(""), StandardCharsets.UTF_8);
+            }
+            String dateTime = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now());
+            String output = dateTime + "\tDifficulty: " + serverDifficulty + "\tUsername: " + getHighestScore().getKey() +"\tScore: " + getHighestScore().getValue() + "\t" + succ + "\n";
+            Files.write(path, output.getBytes(), StandardOpenOption.APPEND);
+        }
+
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Start new game
      */
@@ -368,6 +415,8 @@ public class Server extends JFrame implements Runnable {
         catch(IOException e){
             e.printStackTrace();
         }
+
+        writeServerHighScore(goodEnding);
     }
 
     /**

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.*;
-
 /**
  * 
  * @author Truki
@@ -257,6 +256,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         app.setLost(true);
         if(!app.isNetPlay()){
             updatePanelGodMode();
+            app.WriteLocalHighScore(false);
         }
         //app.WriteScore();
     }
@@ -287,6 +287,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
         app.setWon(true);
         if(!app.isNetPlay()){
             updatePanelGodMode();
+            app.WriteLocalHighScore(goodEnding);
         }
         //app.WriteScore();
     }

@@ -7,11 +7,14 @@ import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 
 import javax.swing.JFrame;
 
@@ -34,7 +37,7 @@ public class Demineur extends JFrame implements Runnable {
     public static int DEATH = 5;
     public static int DIFF = 6;
     public static int SCOREUPDATE = 7;
-    private static String FILENAME = "scores.dat";
+    private static String LOCALHIGHSCOREDATA = "localHighScore.dat";
 
     //Online components
     private Socket socket;
@@ -176,24 +179,24 @@ public class Demineur extends JFrame implements Runnable {
     /**
      * Write score in a savefile
      */
-    public void WriteScore(){
+    public void WriteLocalHighScore(boolean success){
+        String succ;
+        
+        if(success){
+            succ = "CLEARED";
+        }
+        else{
+            succ = "FAILED";
+        }
+
         try{
-            Path path = Paths.get(FILENAME);
-
+            Path path = Paths.get(LOCALHIGHSCOREDATA);
             if(!Files.exists(path)){
-                for(int i = 0; i<Level.values().length; i++){
-                    //if(difficulty)
-                }
+                Files.write(path, Arrays.asList(""), StandardCharsets.UTF_8);
             }
-
-            FileOutputStream file = new FileOutputStream(FILENAME);
-            BufferedOutputStream buffer = new BufferedOutputStream(file);
-            DataOutputStream os = new DataOutputStream(buffer);
-
             String dateTime = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now());
-            String output = dateTime + " - CLEAR TIME: " + appGui.getCompteur().getTime() + "\n";
-            os.writeBytes(output);
-            os.close();
+            String output = dateTime + "\tDifficulty: " + difficulty + "\tTime: " + appGui.getCompteur().getTime() +"\tScore: " + score + "\t" + succ + "\n";
+            Files.write(path, output.getBytes(), StandardOpenOption.APPEND);
         }
 
         catch(IOException e){

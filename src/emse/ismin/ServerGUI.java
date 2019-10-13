@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
  * GUI of the Demineur server.
  */
 public class ServerGUI extends JPanel implements ActionListener{
-    
+
     private static final long serialVersionUID = -399773621255213729L;
 
     private Server server;
@@ -44,7 +44,7 @@ public class ServerGUI extends JPanel implements ActionListener{
     }
 
     /**
-     * 
+     * Add a message to the server text field
      * @param str
      */
     protected void addMsg(String str){
