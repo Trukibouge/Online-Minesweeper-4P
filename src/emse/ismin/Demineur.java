@@ -86,11 +86,7 @@ public class Demineur extends JFrame implements Runnable {
             champ.newGame();
         }
 
-		appGui = new DemineurGUI(this);
-		setContentPane(appGui);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		pack();
-		setVisible(true);
+		newGUI();
 	}
 
 
@@ -140,7 +136,18 @@ public class Demineur extends JFrame implements Runnable {
             appGui.updateScoreLabel();
             appGui.newGame(difficulty);
         }
-	}
+    }
+    
+    /**
+     * Create new GUI
+     */
+    public void newGUI(){
+        appGui = new DemineurGUI(this);
+		setContentPane(appGui);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		pack();
+		setVisible(true);
+    }
 
     /**
      * Change difficulty and create a new champ
@@ -432,6 +439,10 @@ public class Demineur extends JFrame implements Runnable {
 
     public void setNetPlay(boolean netPlay) {
         this.netPlay = netPlay;
+    }
+
+    public void setAppGui(DemineurGUI appGui) {
+        this.appGui = appGui;
     }
 
 }

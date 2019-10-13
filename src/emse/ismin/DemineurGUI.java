@@ -3,7 +3,9 @@ package emse.ismin;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.ItemEvent;
 
 import javax.swing.*;
 /**
@@ -37,7 +39,9 @@ public class DemineurGUI extends JPanel implements ActionListener {
 	private JMenuItem menuMedium = new JMenuItem("Medium", KeyEvent.VK_M);
 	private JMenuItem menuHard = new JMenuItem("Hard", KeyEvent.VK_H);
 	private JMenuItem menuImpossible = new JMenuItem("Impossible", KeyEvent.VK_I);
-	private JMenuItem menuCustom  = new JMenuItem("Custom", KeyEvent.VK_C);
+    private JMenuItem menuCustom  = new JMenuItem("Custom", KeyEvent.VK_C);
+    
+    private JCheckBoxMenuItem menuNetplay;
 	
 	private JMenuItem menuQuit = new JMenuItem("Quit", KeyEvent.VK_Q);
 	private JMenuItem menuHelp= new JMenuItem("Help", KeyEvent.VK_H);
@@ -82,7 +86,7 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		menuHard.addActionListener(this);
 		menuImpossible.addActionListener(this);
 		menuCustom.addActionListener(this);
-		
+        
 		menuNewGame.add(menuEasy);
 		menuNewGame.add(menuMedium);
 		menuNewGame.add(menuHard);
@@ -97,7 +101,19 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		menuGame.add(menuReset);
 		
 		menuQuit.setAccelerator((KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.CTRL_MASK)));
-		menuQuit.addActionListener(this);
+        menuQuit.addActionListener(this);
+        
+
+        menuNetplay = new JCheckBoxMenuItem("Go online!!", app.isNetPlay());
+        menuGame.add(menuNetplay);
+        menuNetplay.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                app.setNetPlay(menuNetplay.getState());
+                app.reset();  
+                app.newGUI();
+            }
+        });
+
 		menuGame.add(menuQuit);
 		
 		//About
@@ -318,14 +334,14 @@ public class DemineurGUI extends JPanel implements ActionListener {
 		if(e.getSource() == menuEasy) {
             app.setNetPlay(false);
 			newGame(Level.EASY);
-		}
-		
-		if(e.getSource() == menuMedium){
+        }
+
+        if(e.getSource() == menuMedium){
             app.setNetPlay(false);
-			newGame(Level.MEDIUM);
-		}
-		
-		if(e.getSource() == menuHard){
+            newGame(Level.MEDIUM);
+        }
+
+        if(e.getSource() == menuHard){
             app.setNetPlay(false);
 			newGame(Level.HARD);
 		}
