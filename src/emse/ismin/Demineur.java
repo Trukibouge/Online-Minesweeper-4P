@@ -368,18 +368,27 @@ public class Demineur extends JFrame implements Runnable {
             e.printStackTrace();
         }
     }
-    
+
+    /**
+     * Send message to all
+     * @param msg
+     */
     protected void sendMsg(String msg){
-        try{
-            System.out.println("Sending message to server: " + msg);
-            outputStream.writeInt(Demineur.MSG);
-            outputStream.writeUTF(msg);
-        }
-        catch(IOException e){
-            e.printStackTrace();
+        if(isConnected()){
+            try{
+                System.out.println("Sending message to server: " + msg);
+                outputStream.writeInt(Demineur.MSG);
+                outputStream.writeUTF(msg);
+            }
+            catch(IOException e){
+                e.printStackTrace();
+            }
         }
     }
 
+    /**
+     * Send death to server
+     */
     protected void sendDeath(){
         try{
             System.out.println("Sending client death");
